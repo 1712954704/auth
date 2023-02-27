@@ -14,7 +14,7 @@
  * Controller、Service、Manager中获取容器调用方法
 
  */
-namespace App\Http\Service\common;
+namespace App\Http\Service;
 
 use library\Cache\Base;
 use library\Cache\Drivers\Redis;

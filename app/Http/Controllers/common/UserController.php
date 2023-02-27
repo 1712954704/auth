@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\common;
 
 
-use App\Http\Service\common\ServiceBase;
+use App\Http\Service\ServiceBase;
 use App\Http\Service\common\UserService;
 use App\Models\common\User;
 use App\Models\common\UserToken;

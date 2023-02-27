@@ -46,7 +46,7 @@ class BaseController
 
         // 权限验证
         if ($this->is_login){
-//            $this->check_auth($token);
+            $this->check_auth($token);
         }
 
 
@@ -140,52 +140,14 @@ class BaseController
             }
         }
 
-//        $check_result = $this->admin_model->check_auth($token);
-//        $check_result = resolve(UserService::class)->check_auth($token);
-        $check_result = UserService::check_auth($token);
-        //获取redis信息
-        if(isset($check_result['data']['admin_info']['account'])){
-//            $redis_result = $this->_container->S_Admin_Admin()->get_admin_user_mobile($check_result['data']['admin_info']['account']);
-            $is_check_code = $this->_container->SM_Cache_Admin()->get_tag_is_verify_code($check_result['data']['admin_info']['account']);
-            //未验证成功手机号不允许操作(退出登录、发送验证码、检测验证码、绑定手机号除外)
-            if($is_check_code==0 && !strstr($_SERVER['REQUEST_URI'],'bind_mobile') && !strstr($_SERVER['REQUEST_URI'],'send_code') && !strstr($_SERVER['REQUEST_URI'],'verify_code') && !strstr($_SERVER['REQUEST_URI'],'logout')){
-                \Common::response_error_header(401, 'Verify by SMS first');
-            }
-            //检测是否存在12小时未操作
-            $no_action_result = $this->_container->SM_Cache_Admin()->get_admin_user_no_action_tab($check_result['data']['admin_info']['account']);
-            if(empty($no_action_result)){
-                //token要过期
-                $token_result = $this->_container->B_Admin()->logout($token);
-                if($token_result){
-                    //返回错误提示
-                    \Common::response_error_header(401, 'No operation in 12 hours. Please log in again');
-                }else{
-                    //返回错误提示
-                    \Common::response_error_header(500, 'Database Error');
-                }
-            }
-
+        $user_service = new UserService();
+        $check_result = $user_service->get_user_info_by_token($token);
+        if (!$check_result){ // token错误
+            return false;
         }
-
-        //socket分布式白名单
-        if($check_result['code'] != 200 && $token == $this->my_config['socket_token']){
-            if ($this->my_config['environment'] !== 'test') {
-                $ip = \Common::get_ip2();
-                $socket_id = explode(',', $this->my_config['socket_ip']);
-                if (!in_array($ip, $socket_id)) {
-                    \Common::response_error_header(401, 'invalid token 3');
-                }
-            }
-            $check_result = $this->admin_model->socket_check_auth();
-        }
-
-        if ($check_result['code'] == 200){
-            $this->token = $token;
-            $this->admin_info = $check_result['data']['admin_info'];
-            return;
-        } else{
-            \Common::response_error_header(401, $check_result['data']);
-        }
+        // 获取用户权限信息并验证
+        $auth_result = $user_service->get_user_auth_info_by_id($check_result['id']);
+        
 
     }
 

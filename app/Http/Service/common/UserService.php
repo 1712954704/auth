@@ -2,8 +2,13 @@
 
 namespace App\Http\Service\common;
 
+use App\Http\Manager\Cache\UserManager;
+use App\Models\common\User;
+use App\Models\common\UserInfo;
 use App\Models\common\UserToken;
 use Illuminate\Support\Facades\Redis;
+use App\Http\Service\ServiceBase;
+use library\Constants\Model\UserConst;
 
 class UserService extends ServiceBase
 {
@@ -13,51 +18,19 @@ class UserService extends ServiceBase
 
     }
 
-
     /**
-     * 获取用户信息
-     * @param string $token
-     * @return mixed
-     */
-    public function get_user_info_by_token($token)
-    {
-
-        // 获取用户缓存信息
-        $user_info = 1;
-//        $res = Redis::hget('runoobkey');
-//        $res = Redis::hmset('test_key',['name'=>'test']);
-//        $res = Redis::hmget('test_key','name');
-//        $res = Redis::hgetall('test_key');
-//        $res = Redis::hmget('runoobkey','name');
-//        $res = Redis::hgetall($token);
-//        var_dump($res);exit();
-
-        $user_info = Redis::hgetall($token);  // cache 缓存常量定义
-
-        return $user_info;
-    }
-
-
-    /**
-     * 使用token获取用户信息
+     * 根据token获取用户信息
      * @param string $token 用户token
      * @param string $fields 字段名
-     * @return mixed
+     * @return array
     */
-    public function check_auth($token,$fields='')
+    public function get_user_info_by_token($token,$fields='')
     {
-
-        var_dump($this->_redis);die();
-//        $redis = $this->get_redis();
-        $redis = $this->_redis;
-
-
-        $data = [];
         // 使用token获取用户缓存信息
         if ($fields){
-            $data[$fields] = Redis::hmget($token,$fields);  // 获取全部信息
+            $data = $this->_redis->hmget($token,$fields);  // 获取全部信息
         }else{
-            $data = Redis::hgetall($token);  // 获取全部信息
+            $data = $this->_redis->hgetall($token);  // 获取全部信息
         }
 
         if (!$data){  // token缓存不存在则查询数据库用户token是否存在及状态
@@ -69,22 +42,105 @@ class UserService extends ServiceBase
             // 用户token存在则重新设置用户信息
             if ($list['status'] == UserToken::STATUS_NORMAL){
                 $data = [
-                    'id' => $list['id'],
+                    'id' => $list['user_id'],
                     'type' => $list['type'],
                 ];
-                Redis::hmset($token,$data);  // 设置token信息
-                $data = Redis::hmget($token,$fields);  // 获取全部信息
+                $this->_redis->hmset($token,$data);  // 设置token信息
+                $data = $this->_redis->hmget($token,$fields);  // 获取全部信息
+            }
+        }
+        return $data ?? [];
+    }
+
+
+    /**
+     * 根据用户id获取用户信息
+     * @param string $token 用户token
+     * @param string $fields 字段名
+     * @return array
+     */
+    public function get_user_info_by_id($user_id,$fields='')
+    {
+        $user_manager = new UserManager();
+        $redis_key = $user_manager->get_user_cache_key($user_id);
+
+        // 使用token获取用户缓存信息
+        if ($fields){
+            $data = $this->_redis->hmget($redis_key,$fields);  // 获取全部信息
+        }else{
+            $data = $this->_redis->hgetall($redis_key);  // 获取全部信息
+        }
+
+        if (!$data && !$this->_redis->exists($redis_key)){  // 用户缓存信息查不到则生成
+            $user_info = $this->_inner_get_user_info_for_cache($user_id);
+            if ($user_info){
+                $this->_redis->hMset($redis_key, $user_info);
+                $data = $this->_redis->hgetall($redis_key);  // 获取全部信息
             }
         }
         return $data;
     }
 
     /**
-     * test
+     * 根据用户id获取用户权限信息
+     * @param string $token 用户token
+     * @param string $fields 字段名
+     * @return array
      */
-    public function test()
+    public function get_user_auth_info_by_id($user_id,$fields='')
     {
-        var_dump(23121);
+        $user_manager = new UserManager();
+        $redis_key = $user_manager->get_user_auth_cache_key($user_id);
+
+        // 使用token获取用户缓存信息
+        if ($fields){
+            $data = $this->_redis->hmget($redis_key,$fields);  // 获取全部信息
+        }else{
+            $data = $this->_redis->hgetall($redis_key);  // 获取全部信息
+        }
+
+        if (!$data && !$this->_redis->exists($redis_key)){  // 用户缓存信息查不到则生成
+            $user_info = $this->_inner_get_user_info_for_cache($user_id);
+            if ($user_info){
+                $this->_redis->hMset($redis_key, $user_info);
+                $data = $this->_redis->hgetall($redis_key);  // 获取全部信息
+            }
+        }
+        return $data;
+    }
+
+
+    /**
+     * 获取要存储到缓存里的用户信息数据
+     * @scope 内部使用
+     *
+     * @param int $user_id 用户id
+     *
+     * @return array
+     */
+    public function _inner_get_user_info_for_cache($user_id)
+    {
+        $user_model = $this->_container->M_User();
+        $user = $user_model->get_user_by_id($user_id, [UserConstants::STATUS_ENABLE, UserConstants::STATUS_CANCEL_LOGOUT]);
+
+        $user_model = new User();
+        $user = $user_model->get_user_by_id($user_id,UserConst::COMMON_STATUS_NORMAL);
+
+        if (empty($user)) {
+            return array();
+        }
+
+        // 查询副表用户信息
+        $user_info_model = new UserInfo();
+
+        $user_info = $user_info_model->get_user_info($user_id);
+        if (empty($user_info)){
+            return array();
+        }
+        // 合并用户信息数组
+        $user_info = array_merge($user,$user_info);
+
+        return $user_info;
     }
 
 }

@@ -7,7 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class UserInfo extends Authenticatable
 {
 //    use HasFactory;
     use HasApiTokens, HasFactory, Notifiable;
@@ -24,7 +24,7 @@ class User extends Authenticatable
      *
      * @var string
      */
-    protected $table = 'user';
+    protected $table = 'user_info';
 
     /**
      * 与数据表关联的主键.
@@ -48,13 +48,9 @@ class User extends Authenticatable
      * @param string $field
      * @return bool|mixed
      */
-    public function get_user_by_id($user_id,$status = null,$field = "*")
+    public function get_user_info($user_id,$field = "*")
     {
-        $where['id']= $user_id;
-
-        if($status !== null){
-            $where['status']= $status;
-        }
+        $where['user_id']= $user_id;
         return $this->select($field)->where($where)->get();
     }
 
