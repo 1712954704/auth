@@ -1,9 +1,5 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: pandy
- * Date: 2019/12/2
- * Time: 5:03 PM
  *
  * 规范：
  * 1、不要定义一级key,在key前面追加模块前缀； 如用户模块 self::MODULE_USER . 'key';

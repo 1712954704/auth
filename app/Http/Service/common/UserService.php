@@ -2,10 +2,10 @@
 
 namespace App\Http\Service\common;
 
-
+use App\Models\common\UserToken;
 use Illuminate\Support\Facades\Redis;
 
-class UserService
+class UserService extends ServiceBase
 {
 
     public function __construct()
@@ -44,24 +44,39 @@ class UserService
      * @param string $fields 字段名
      * @return mixed
     */
-    public function check_auth($token,$fields=''){
+    public function check_auth($token,$fields='')
+    {
+
+        var_dump($this->_redis);die();
+//        $redis = $this->get_redis();
+        $redis = $this->_redis;
+
+
+        $data = [];
         // 使用token获取用户缓存信息
         if ($fields){
-            $user_info = Redis::hmget($token,$fields);  // 获取全部信息
+            $data[$fields] = Redis::hmget($token,$fields);  // 获取全部信息
         }else{
-            $user_info = Redis::hgetall($token);  // 获取全部信息
+            $data = Redis::hgetall($token);  // 获取全部信息
         }
-        $data = array(
-            'code' => 401,
-            'msg' => '',
-            'data' => []
-        );
-        if (!$user_info){  // token不存在
-            // 查询数据库用户token是否寻找
-            $data['msg'] = 'Token Not Found';
-            return $data;
+
+        if (!$data){  // token缓存不存在则查询数据库用户token是否存在及状态
+            $where = [
+                'token' => $token
+            ];
+            $list = UserToken::where($where)->first();
+            $list = \Common::laravel_to_array($list);
+            // 用户token存在则重新设置用户信息
+            if ($list['status'] == UserToken::STATUS_NORMAL){
+                $data = [
+                    'id' => $list['id'],
+                    'type' => $list['type'],
+                ];
+                Redis::hmset($token,$data);  // 设置token信息
+                $data = Redis::hmget($token,$fields);  // 获取全部信息
+            }
         }
-        return $user_info;
+        return $data;
     }
 
     /**

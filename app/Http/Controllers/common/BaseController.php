@@ -46,7 +46,7 @@ class BaseController
 
         // 权限验证
         if ($this->is_login){
-            $this->check_auth($token);
+//            $this->check_auth($token);
         }
 
 
@@ -188,6 +188,7 @@ class BaseController
         }
 
     }
+
 
 
 }

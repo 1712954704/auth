@@ -1642,4 +1642,17 @@ class Common{
         return $time;
     }
 
+    /**
+     * 数组转换
+     * @param object $object
+     * @return array
+    */
+    public static function laravel_to_array($object)
+    {
+        if ($object){
+            return $object->toArray();
+        }
+        return [];
+    }
+
 }

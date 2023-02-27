@@ -3,11 +3,16 @@
 namespace App\Http\Controllers\common;
 
 
+use App\Http\Service\common\ServiceBase;
 use App\Http\Service\common\UserService;
 use App\Models\common\User;
+use App\Models\common\UserToken;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\URL;
+
+//use library\AutoLoad\Cache\Drivers\Redis;
 
 class UserController extends BaseController
 {
@@ -26,7 +31,32 @@ class UserController extends BaseController
     /**
      *test
     */
-    public function home(){
+    public function home()
+    {
+
+        $user = new ServiceBase();
+        $redis = $user->get_redis();
+        $fields = ['name','type'];
+        $list = $redis->hMGet('test_key',$fields);
+        var_dump($list);die();
+
+
+//        Redis::hmset('test_key',['type'=>'1']);
+
+//        $res = Redis::hmget('runoobkey','name');
+        $fields = ['name','type'];
+        $res = Redis::hMGet('test_key',$fields);
+//        $res = Redis::hmget('runoobkey',$fields);
+        var_dump($res);die();
+
+        $where = [
+            'token' => '12'
+        ];
+        $list = UserToken::where($where)->first();
+        $list = \Common::laravel_to_array($list);
+//        $list = UserToken::where($where)->get()->toArray();
+        var_dump($list);die();
+
 
         $token = 'runoobkey';
         $result = resolve(UserService::class)->get_user_info_by_token($token);

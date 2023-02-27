@@ -40,4 +40,10 @@ class UserToken extends Authenticatable
      */
     public $timestamps = false;
 
+
+    // token状态常量
+    const STATUS_NORMAL = 1; // 正常
+    const STATUS_DEL = -1; // 已删除
+
+
 }
