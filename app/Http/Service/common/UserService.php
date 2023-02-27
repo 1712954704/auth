@@ -57,6 +57,7 @@ class UserService
             'data' => []
         );
         if (!$user_info){  // token不存在
+            // 查询数据库用户token是否寻找
             $data['msg'] = 'Token Not Found';
             return $data;
         }
