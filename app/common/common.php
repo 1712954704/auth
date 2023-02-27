@@ -1,12 +1,4 @@
 <?php
-use library\AutoLoad\Constants\StatusConstants;
-use library\AutoLoad\Constants\Constants;
-use library\AutoLoad\CBox;
-use library\AutoLoad\Constants\UserConstants;
-use library\AutoLoad\Service\User\UserService;
-use MiniWorld\Model\User;
-use library\AutoLoad\FrameworkExt\ConfigExt;
-use library\AutoLoad\Utils\Encryption;
 
 class Common{
     protected static $_module_configs = [];

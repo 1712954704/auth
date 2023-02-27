@@ -27,7 +27,10 @@
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
         },
-        "files":["app/common/common.php"]
+        "files":[
+            "app/common/common.php",
+            "app/Constants/CacheConstants.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

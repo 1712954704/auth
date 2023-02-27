@@ -38,6 +38,52 @@ class UserService
     }
 
 
+
+    public function check_auth($token){
+        $sql = "select * from tbl_admin_token where token=:token and status=1";
+        $sth = $this->adapter->query($sql);
+        $result = $sth -> execute([
+            ':token' => $token,
+        ]);
+        $selected_token = $result->current();
+
+
+
+
+
+
+
+        if (!empty($selected_token)){
+//        if(1){
+            $user_info = $this->get_admin_info_by_id($selected_token['admin_id']);
+//            $user_info = $this->get_admin_info_by_id(1);
+            if ($user_info['code'] == 200){
+                return array(
+                    'code' => 200,
+                    'data' => array(
+                        'token' => $selected_token['token'],
+                        'admin_info' => array(
+                            'id' => $user_info['data']['id'],
+                            'type' => $user_info['data']['type'],
+                            'account' => $user_info['data']['account'],
+                            'rule_id_array'=> $this->get_admin_rule_id_list($user_info['data']['id'], $user_info['data']['type'])
+                        ),
+                    )
+                );
+            }else{
+                return array(
+                    'code' => 401,
+                    'data' => 'Admin Not Found'
+                );
+            }
+        } else{
+            return array(
+                'code' => 401,
+                'data' => 'Token Not Found'
+            );
+        }
+    }
+
     /**
      * test
      */

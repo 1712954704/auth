@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\common;
 
 
+use App\Http\Service\common\UserService;
+
 class BaseController
 {
     protected $is_login = 1;  // 是否需要登录 1:是 0:否
@@ -43,9 +45,9 @@ class BaseController
         header("Cache-Control: no-cache");
 
         // 权限验证
-//        if ($this->is_login){
-//            $this->check_auth($token);
-//        }
+        if ($this->is_login){
+            $this->check_auth($token);
+        }
 
 
     }
@@ -139,6 +141,9 @@ class BaseController
         }
 
         $check_result = $this->admin_model->check_auth($token);
+
+//        $check_result = resolve(UserService::class)->check_auth($token);
+        $check_result = UserService::check_auth($token);
         //获取redis信息
         if(isset($check_result['data']['admin_info']['account'])){
 //            $redis_result = $this->_container->S_Admin_Admin()->get_admin_user_mobile($check_result['data']['admin_info']['account']);
