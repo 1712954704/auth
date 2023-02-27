@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EmployeesController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,3 +19,16 @@ Route::get('/', function () {
 });
 
 Route::get('/user', [UserController::class, 'index']);
+
+Route::get('/test', function () {
+    return ['test','id'];
+});
+
+Route::get('/ehr/user/{id}', function () {
+    return ['test','id'];
+});
+
+// BIO 员工详情接口
+Route::get('/user/show/{id}', [EmployeesController::class, 'show']);
+Route::get('/add', [EmployeesController::class, 'add']);
+
