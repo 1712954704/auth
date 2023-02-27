@@ -69,5 +69,4 @@ class CacheConstants {
     const HASH_USER_INFO_PREFIX = self::MODULE_USER . 'info:';                  // 用户信息缓存 user:info:用户id
 
 
-
 }

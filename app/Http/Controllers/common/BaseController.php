@@ -140,8 +140,7 @@ class BaseController
             }
         }
 
-        $check_result = $this->admin_model->check_auth($token);
-
+//        $check_result = $this->admin_model->check_auth($token);
 //        $check_result = resolve(UserService::class)->check_auth($token);
         $check_result = UserService::check_auth($token);
         //获取redis信息
