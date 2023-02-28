@@ -58,18 +58,21 @@ class LoginController extends Controller
             ->where('pwd', '=', $password)
             ->first();
 
-        // ->where('account', '=', $username)
 
         // 设定返回接口code 1 假的 2 真的
-        $response['code'] = $user?'2':'1';
-        $response['msg']  = $user?'success':'账号或密码错误';
-        $response['data'] = $user ;
-        // 参数1：中文不转为unicode ，对应的数字 256
-        return json_encode($response);
+        $response['code']  = $user?'2':'1';
+        $response['msg']   = $user?'success':'账号或密码错误';
+        $response['data']  = $user ;
+        $string = md5(uniqid());
+        $response['token'] = $string;
 
 
 
         // 刷新用户信息缓存
+        Redis::set('token_id', $username);
+        Redis::set('token_key', $string);
+
+        return json_encode($response);
 
 
     }
