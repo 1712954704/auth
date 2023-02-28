@@ -82,7 +82,7 @@ class BaseController
 
         // 权限验证
         if ($this->is_login && !in_array($this->route_at,$this->my_config['no_login'])){
-//            $this->check_auth($token);
+            $this->check_auth($token);
         }
 
     }
