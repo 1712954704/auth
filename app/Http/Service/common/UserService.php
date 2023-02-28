@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Service\common;
+namespace App\Http\Service\Common;
 
 use App\Http\Manager\Cache\UserManager;
 use App\Models\common\User;
 use App\Models\common\UserInfo;
 use App\Models\common\UserToken;
-use Illuminate\Support\Facades\Redis;
 use App\Http\Service\ServiceBase;
 use library\Constants\Model\UserConst;
 
@@ -26,9 +25,14 @@ class UserService extends ServiceBase
     */
     public function get_user_info_by_token($token,$fields='')
     {
+        $return_data = [
+            'code' => 200,
+            'data' => []
+        ];
         // 判断key是否存在
         if (!$this->_redis->exists($token)){
-            return [];
+            $return_data['code'] = 201;
+            return $return_data;
         }
 
         // 使用token获取用户缓存信息
@@ -54,7 +58,8 @@ class UserService extends ServiceBase
                 $data = $this->_redis->hmget($token,$fields);  // 获取全部信息
             }
         }
-        return $data ?? [];
+        $return_data['data'] = $data;
+        return $return_data;
     }
 
 
@@ -66,6 +71,10 @@ class UserService extends ServiceBase
      */
     public function get_user_info_by_id($user_id,$fields='')
     {
+        $return_data = [
+            'code' => 200,
+            'data' => []
+        ];
         $user_manager = new UserManager();
         $redis_key = $user_manager->get_user_cache_key($user_id);
 
@@ -83,7 +92,8 @@ class UserService extends ServiceBase
                 $data = $this->_redis->hgetall($redis_key);  // 获取全部信息
             }
         }
-        return $data;
+        $return_data['data'] = $data;
+        return $return_data;
     }
 
     /**
@@ -118,7 +128,7 @@ class UserService extends ServiceBase
 
         // 解码
         foreach ($data as &$value){
-            $value = json_decode($value,true);
+            $value = strtolower(json_decode($value,true));
         }
 
         return $data;

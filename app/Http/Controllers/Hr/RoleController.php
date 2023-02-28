@@ -1,12 +1,14 @@
 <?php
-
+/**
+ *
+*/
 namespace App\Http\Controllers\Hr;
 
 use App\Http\Controllers\BaseController;
 use App\Http\Service\Hr\AuthService;
 use library\Constants\StatusConstants;
 
-class AuthController extends BaseController
+class RoleController extends BaseController
 {
 
     public function __construct()
@@ -16,7 +18,7 @@ class AuthController extends BaseController
 
 
     /**
-     * 路由增删改查
+     * 角色增删改查
      *
      */
     public function rule()
