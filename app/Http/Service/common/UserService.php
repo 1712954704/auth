@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Service\common;
+namespace App\Http\Service\Common;
 
 use App\Http\Manager\Cache\UserManager;
 use App\Models\common\User;
 use App\Models\common\UserInfo;
 use App\Models\common\UserToken;
-use Illuminate\Support\Facades\Redis;
 use App\Http\Service\ServiceBase;
 use library\Constants\Model\UserConst;
 
@@ -15,7 +14,7 @@ class UserService extends ServiceBase
 
     public function __construct()
     {
-
+        parent::__construct();
     }
 
     /**
@@ -26,6 +25,16 @@ class UserService extends ServiceBase
     */
     public function get_user_info_by_token($token,$fields='')
     {
+        $return_data = [
+            'code' => 200,
+            'data' => []
+        ];
+        // 判断key是否存在
+        if (!$this->_redis->exists($token)){
+            $return_data['code'] = 201;
+            return $return_data;
+        }
+
         // 使用token获取用户缓存信息
         if ($fields){
             $data = $this->_redis->hmget($token,$fields);  // 获取全部信息
@@ -49,7 +58,8 @@ class UserService extends ServiceBase
                 $data = $this->_redis->hmget($token,$fields);  // 获取全部信息
             }
         }
-        return $data ?? [];
+        $return_data['data'] = $data;
+        return $return_data;
     }
 
 
@@ -61,6 +71,10 @@ class UserService extends ServiceBase
      */
     public function get_user_info_by_id($user_id,$fields='')
     {
+        $return_data = [
+            'code' => 200,
+            'data' => []
+        ];
         $user_manager = new UserManager();
         $redis_key = $user_manager->get_user_cache_key($user_id);
 
@@ -78,7 +92,8 @@ class UserService extends ServiceBase
                 $data = $this->_redis->hgetall($redis_key);  // 获取全部信息
             }
         }
-        return $data;
+        $return_data['data'] = $data;
+        return $return_data;
     }
 
     /**
@@ -102,10 +117,20 @@ class UserService extends ServiceBase
         if (!$data && !$this->_redis->exists($redis_key)){  // 用户缓存信息查不到则生成
             $user_info = $this->_inner_get_user_info_for_cache($user_id);
             if ($user_info){
+                // 数组转json存储
+                foreach($user_info as &$item){
+                    $item = json_encode($item);
+                }
                 $this->_redis->hMset($redis_key, $user_info);
                 $data = $this->_redis->hgetall($redis_key);  // 获取全部信息
             }
         }
+
+        // 解码
+        foreach ($data as &$value){
+            $value = strtolower(json_decode($value,true));
+        }
+
         return $data;
     }
 
@@ -120,9 +145,6 @@ class UserService extends ServiceBase
      */
     public function _inner_get_user_info_for_cache($user_id)
     {
-        $user_model = $this->_container->M_User();
-        $user = $user_model->get_user_by_id($user_id, [UserConstants::STATUS_ENABLE, UserConstants::STATUS_CANCEL_LOGOUT]);
-
         $user_model = new User();
         $user = $user_model->get_user_by_id($user_id,UserConst::COMMON_STATUS_NORMAL);
 

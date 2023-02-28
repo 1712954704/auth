@@ -20,6 +20,7 @@ use library\Cache\Base;
 use library\Cache\Drivers\Redis;
 //use library\AutoLoad\CBox;
 //use library\AutoLoad\Traits\LogCommonTrait;
+use library\Constants\StatusConstants;
 use library\Utils\Lock;
 
 class ServiceBase {
@@ -33,29 +34,17 @@ class ServiceBase {
      * @var Redis
      */
     protected $_redis;
-    /**
-     * 直播redis
-     * @var Base|Redis
-     */
-    protected $_scene_redis;
-    /**
-     * 直播redis db4
-     * @var Base|Redis
-     */
-    protected $_scene_db4_redis;
-    /**
-     * 星星积分redis
-     * @var Base|Redis
-     */
-    protected $_stars_redis;
+
+    protected $return_data = [
+        'code' => StatusConstants::SUCCESS,
+        'msg'  => '',
+        'data' => []
+    ];
 
     public function __construct()
     {
 //        $this->_container = CBox::instance();
         $this->_redis = $this->get_redis();
-//        $this->_scene_redis = $this->get_scene_redis();
-//        $this->_scene_db4_redis = $this->get_scene_db4_redis();
-//        $this->_stars_redis = $this->get_stars_redis();
     }
 
     /**

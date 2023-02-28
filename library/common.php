@@ -360,11 +360,11 @@ class Common{
     {
         //如果为空则使用全局msg提示
         if($msg == ''){
-            $msg = StatusConstants::ERROR_TO_MSG_COPY[$status]??'';
+            $msg = \library\Constants\StatusConstants::ERROR_TO_MSG_COPY[$status]??'';
         }
 
         $result = ['status' => $status, 'data' => $data, 'msg' => $msg, 'code' => 200];
-        $status_to_code_maps = StatusConstants::STATUS_TO_CODE_MAPS;
+        $status_to_code_maps = \library\Constants\StatusConstants::STATUS_TO_CODE_MAPS;
         // Status转Code
         if (isset($status_to_code_maps[$status])) {
             $result['code'] = $status_to_code_maps[$status];

@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Models\Common;
+namespace App\Models\Hr;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class UserRole extends Authenticatable
 {
 //    use HasFactory;
     use HasApiTokens, HasFactory, Notifiable;
@@ -17,14 +17,14 @@ class User extends Authenticatable
      *
      * @var string
      */
-    protected $connection = 'mysql_common';
+    protected $connection = 'mysql_hr';
 
     /**
      * 与模型关联的数据表.
      *
      * @var string
      */
-    protected $table = 'user';
+    protected $table = 'user_role';
 
     /**
      * 与数据表关联的主键.
@@ -39,23 +39,5 @@ class User extends Authenticatable
      * @var bool
      */
     public $timestamps = false;
-
-    /**
-     * 获取用户信息的查询
-     * @date 2023/02/27
-     * @param $user_id
-     * @param null $status
-     * @param string $field
-     * @return bool|mixed
-     */
-    public function get_user_by_id($user_id,$status = null,$field = "*")
-    {
-        $where['id']= $user_id;
-
-        if($status !== null){
-            $where['status']= $status;
-        }
-        return $this->select($field)->where($where)->get();
-    }
 
 }
