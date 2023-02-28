@@ -1,18 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\common;
+namespace App\Http\Controllers\Common;
 
 
+use App\Http\Controllers\BaseController;
 use App\Http\Service\ServiceBase;
 use App\Http\Service\common\UserService;
-use App\Models\common\User;
 use App\Models\common\UserToken;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\URL;
 
-//use library\AutoLoad\Cache\Drivers\Redis;
 
 class UserController extends BaseController
 {

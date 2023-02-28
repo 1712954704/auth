@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\common;
+namespace App\Http\Controllers;
 
 
 use App\Http\Service\common\UserService;
@@ -36,9 +36,6 @@ class BaseController
 //        if ($this->my_config['flag']['write_debug']){
 //            $this->write_request_info();
 //        }
-
-        //admin模块
-//        $this->admin_model = new Admin();
 
         //跨域
         $this->cross_domain();
