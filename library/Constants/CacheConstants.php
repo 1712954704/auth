@@ -61,9 +61,8 @@ class CacheConstants {
     const VERIFY_CODE_MOBILE_LIMIT_DAILY_SMS_NUM = self::MODULE_AUTH.'vc:mob_d_sms_num:%s:%s'; // 手机号每天限制条数 auth:vc:mob_d_sms_num:(去除+)区号:手机号
 
 
-
-    const HASH_USER_INFO_PREFIX = self::MODULE_USER . 'info:';                  // 用户信息缓存 user:info:用户id
-    const HASH_USER_AUTH_INFO_PREFIX = self::MODULE_USER . 'auth:info:';        // 用户权限信息缓存 user:auth:info:用户id
+//    const HASH_USER_INFO_PREFIX = self::MODULE_USER . 'info:';                  // 用户信息缓存 user:info:用户id
+//    const HASH_USER_AUTH_INFO_PREFIX = self::MODULE_USER . 'auth:info:';        // 用户权限信息缓存 user:auth:info:用户id
 
 
 }

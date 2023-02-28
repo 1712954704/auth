@@ -33,17 +33,19 @@ class UserService extends ServiceBase
             'code' => 200,
             'data' => []
         ];
+        $user_manager = new UserManager();
+        $token_key = $user_manager->get_token_key($token);
         // 判断key是否存在
-        if (!$this->_redis->exists($token)){
+        if (!$this->_redis->exists($token_key)){
             $return_data['code'] = 201;
             return $return_data;
         }
 
         // 使用token获取用户缓存信息
         if ($fields){
-            $data = $this->_redis->hmget($token,$fields);  // 获取全部信息
+            $data = $this->_redis->hmget($token_key,$fields);  // 获取全部信息
         }else{
-            $data = $this->_redis->hgetall($token);  // 获取全部信息
+            $data = $this->_redis->hgetall($token_key);  // 获取全部信息
         }
 
         if (!$data){  // token缓存不存在则查询数据库用户token是否存在及状态
@@ -58,8 +60,8 @@ class UserService extends ServiceBase
                     'id' => $list['user_id'],
                     'type' => $list['type'],
                 ];
-                $this->_redis->hmset($token,$data);  // 设置token信息
-                $data = $this->_redis->hmget($token,$fields);  // 获取全部信息
+                $this->_redis->hmset($token_key,$data);  // 设置token信息
+                $data = $this->_redis->hmget($token_key,$fields);  // 获取全部信息
             }
         }
         $return_data['data'] = $data;
@@ -204,28 +206,10 @@ class UserService extends ServiceBase
         if (empty($token)) return 0;
         // 一个小时刷新一次，避免频繁刷新
         if ((time() - $refresh_token_time) >= 3600) {
-            return $this->get_redis()->expire($this->get_token_key($token), $expire_time);
+//            return $this->get_redis()->expire($this->get_token_key($token), $expire_time);
+            return $this->_redis->expire($this->get_token_key($token), $expire_time);
         }
         return 0;
-    }
-
-    /**
-     * 生成token key
-     *
-     * @param $token
-     *
-     * @return string|array
-     */
-    public function get_token_key($token) {
-        if (is_array($token)) {
-            foreach ($token as &$v) {
-                $v = UserConstants::CACHE_REDIS_TOKEN_KEY_PREFIX . $v;
-            }
-        }
-        else {
-            $token = UserConstants::CACHE_REDIS_TOKEN_KEY_PREFIX . $token;
-        }
-        return $token;
     }
 
 }
