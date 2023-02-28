@@ -44,4 +44,11 @@ class Role extends Authenticatable
      */
     public $timestamps = false;
 
+    /**
+     * 可批量赋值的属性。
+     *
+     * @var array
+     */
+    protected $fillable = ['name','pid','status'];
+
 }

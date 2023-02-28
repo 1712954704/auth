@@ -44,4 +44,11 @@ class RoleAuthRule extends Authenticatable
      */
     public $timestamps = false;
 
+    /**
+     * 可批量赋值的属性。
+     *
+     * @var array
+     */
+    protected $fillable = ['role_id','auth_rule_id'];
+
 }

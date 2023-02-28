@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Common;
 
 
 use App\Http\Controllers\BaseController;
+use App\Http\Service\Hr\RoleService;
 use App\Http\Service\ServiceBase;
 use App\Http\Service\common\UserService;
 use App\Models\common\UserToken;
@@ -36,6 +37,16 @@ class UserController extends BaseController
     */
     public function home()
     {
+//        $role_service = new RoleService();
+//        $data['name']           = $this->check_param('name');
+//        $data['is_menu']        = $this->check_param('is_menu');  // 是否菜单
+//        $data['title']          = $this->data_arr['title'] ?? '';
+//        $data['remark']         = $this->data_arr['remark'] ?? '';
+////        $data['pid']            = $this->data_arr['pid'] ?? 0;
+//        $data['pid']            = $this->check_param('pid',0);
+//        $auth                   = $this->check_param('auth',[1,2]);
+//        $data = $role_service->add_role($data,$auth);
+//        var_dump($data);die();
 
         $user = new ServiceBase();
         $redis = $user->get_redis();

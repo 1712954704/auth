@@ -20,28 +20,27 @@ class AuthController extends BaseController
 
 
     /**
-     * 路由增删改查
+     * 路由相关
      *
      */
     public function rule()
     {
         $auth_service = new AuthService();
         switch ($this->method) {
-            case 'GET':
+            case 'GET':  // 获取路由配置
                 // 检测参数
                 $data = $auth_service->get_auth_rule();
                 break;
-            case 'POST':
+            case 'POST': // 添加路由配置
                 // 检测参数
                 $data['name']            = $this->check_param('name');
                 $data['is_menu']            = $this->check_param('is_menu');  // 是否菜单
                 $data['title']         = $this->data_arr['title'] ?? '';
                 $data['remark']         = $this->data_arr['remark'] ?? '';
                 $data['pid']            = $this->check_param('pid',0);
-                $auth_service = new AuthService();
                 $data = $auth_service->add_auth_rule($data);
                 break;
-            case 'PUT':
+            case 'PUT':  // 更新路由配置
                 // 检测参数
                 $id                    = $this->check_param('id');
                 $data['name']          = $this->data_arr['name'];
@@ -49,7 +48,6 @@ class AuthController extends BaseController
                 $data['title']         = $this->data_arr['title'] ?? '';
                 $data['remark']        = $this->data_arr['remark'] ?? '';
                 $data['pid']           = $this->data_arr('pid',0);
-                $auth_service = new AuthService();
                 $data = $auth_service->update_auth_rule($id,$data);
                 break;
             default:
