@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * User: Jack
+ * Date: 2023/02/28
+ * Email: <1712954704@qq.com>
+ */
 namespace App\Http\Service\Hr;
 
 use App\Http\Manager\Cache\UserManager;

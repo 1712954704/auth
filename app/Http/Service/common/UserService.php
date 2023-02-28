@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * User: Jack
+ * Date: 2023/02/28
+ * Email: <1712954704@qq.com>
+ */
 namespace App\Http\Service\Common;
 
 use App\Http\Manager\Cache\UserManager;
@@ -7,7 +11,7 @@ use App\Models\common\User;
 use App\Models\common\UserInfo;
 use App\Models\common\UserToken;
 use App\Http\Service\ServiceBase;
-use library\Constants\Model\UserConst;
+use library\Constants\Model\UserConstants;
 
 class UserService extends ServiceBase
 {
@@ -163,6 +167,65 @@ class UserService extends ServiceBase
         $user_info = array_merge($user,$user_info);
 
         return $user_info;
+    }
+
+    /**
+     * 缓存token
+     *
+     * @param $token
+     * @param array $data
+     * @param int $expire_time
+     *
+     * @return bool
+     */
+    public function cache_token($token, array $data, $expire_time = \CacheConstants::CACHE_EXPIRE_TIME_HALF_TWO_HOUR) {
+        if (empty($token)) return false;
+        $token = $this->get_token_key($token);
+        // 最近一次刷新token时间
+        $data['refresh_token_time'] = time();
+        $redis = $this->get_redis();
+        $bool = $redis->hMset($token, $data);
+        if ($bool) {
+            $redis->expire($token, $expire_time);
+        }
+        return $bool;
+    }
+
+    /**
+     * 刷新token过期时间
+     *
+     * @param $token
+     * @param int $expire_time
+     * @param int $refresh_token_time 最近一次刷新token时间
+     *
+     * @return int
+     */
+    public function refresh_token_expire($token, $refresh_token_time, $expire_time = \CacheConstants::CACHE_EXPIRE_TIME_HALF_TWO_HOUR) {
+        if (empty($token)) return 0;
+        // 一个小时刷新一次，避免频繁刷新
+        if ((time() - $refresh_token_time) >= 3600) {
+            return $this->get_redis()->expire($this->get_token_key($token), $expire_time);
+        }
+        return 0;
+    }
+
+    /**
+     * 生成token key
+     *
+     * @param $token
+     *
+     * @return string|array
+     */
+    public function get_token_key($token) {
+        if (is_array($token)) {
+            foreach ($token as &$v) {
+                $v = UserConstants::CACHE_REDIS_TOKEN_KEY_PREFIX . $v;
+            }
+        }
+        else {
+            $token = UserConstants::CACHE_REDIS_TOKEN_KEY_PREFIX . $token;
+        }
+        return $token;
     }
 
 }

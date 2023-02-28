@@ -1,7 +1,10 @@
 <?php
-
+/**
+ * User: Jack
+ * Date: 2023/02/28
+ * Email: <1712954704@qq.com>
+ */
 namespace App\Http\Controllers;
-
 
 use App\Http\Service\common\UserService;
 use Illuminate\Support\Facades\Request;
@@ -129,6 +132,20 @@ class BaseController
         if ($user_result['code'] == 200){
             $this->user_info = $user_result['data'];
         }
+
+        // 刷新用户token生存时间
+//        $selected_token = $user_service->get_cache_token($token);
+//        if ($selected_token) {
+//            // 每个小时刷新一次过期时间, 避免频繁刷新
+//            if (!empty($selected_token['refresh_token_time'])) {
+//                $user_service->refresh_token_expire($token, $selected_token['refresh_token_time']);
+//            }
+//        } else{
+//            $selected_token = $this->_container->M_UserToken()->get_token_user($token);
+//            if ($selected_token){
+//                $user_service->cache_token($token, $selected_token);
+//            }
+//        }
 
     }
 
