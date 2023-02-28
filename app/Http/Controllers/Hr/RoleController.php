@@ -24,7 +24,7 @@ class RoleController extends BaseController
      * 角色权限相关
      *
      */
-    public function role()
+    public function role_operate()
     {
         $role_service = new RoleService();
         switch ($this->method) {
@@ -34,23 +34,23 @@ class RoleController extends BaseController
                 break;
             case 'POST':  // 添加角色
                 // 检测参数
-                $data['name']           = $this->check_param('name');
-                $data['is_menu']        = $this->check_param('is_menu');  // 是否菜单
-                $data['title']          = $this->data_arr['title'] ?? '';
-                $data['remark']         = $this->data_arr['remark'] ?? '';
-                $data['pid']            = $this->check_param('pid',0);
-                $auth                   = $this->check_param('auth');
-                $data = $role_service->add_role($data,$auth);
+                $params['name']           = $this->check_param('name');
+                $params['is_menu']        = $this->check_param('is_menu');  // 是否菜单
+                $params['title']          = $this->data_arr['title'] ?? '';
+                $params['remark']         = $this->data_arr['remark'] ?? '';
+                $params['pid']            = $this->check_param('pid',0);
+                $auth                     = $this->check_param('auth');
+                $data = $role_service->add_role($params,$auth);
                 break;
             case 'PUT':  // 更新角色
                 // 检测参数
-                $id                    = $this->check_param('id');
-                $data['name']          = $this->data_arr['name'];
-                $data['is_menu']       = $this->data_arr['is_menu'];  // 是否菜单
-                $data['title']         = $this->data_arr['title'] ?? '';
-                $data['remark']        = $this->data_arr['remark'] ?? '';
-                $data['pid']           = $this->data_arr('pid',0);
-                $data = $role_service->update_role($id,$data);
+                $id                      = $this->check_param('id');
+                $params['name']          = $this->data_arr['name'];
+                $params['is_menu']       = $this->data_arr['is_menu'];  // 是否菜单
+                $params['title']         = $this->data_arr['title'] ?? '';
+                $params['remark']        = $this->data_arr['remark'] ?? '';
+                $params['pid']           = $this->data_arr('pid',0);
+                $data = $role_service->update_role($id,$params);
                 break;
             default:
                 return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL,'Invalid Method');

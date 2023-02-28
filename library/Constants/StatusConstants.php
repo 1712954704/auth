@@ -31,6 +31,7 @@ class StatusConstants
     const ERROR_GET_CONFIG_EXCEPTION = 5006; // 获取配置异常
     const ERROR_UPGRADE_APP_VERSION = 5007; // 请升级App版本
     const ERROR_UPGRADE_AUTH_LEVEL = 5008; // 请升级权限等级
+    const ERROR_UPGRADE_AUTH_LOCK = 5009; // 用户已被锁定
 
     // 不合法错误范围段
     const ERROR_ILLEGAL = 40000;
@@ -115,6 +116,7 @@ class StatusConstants
         self::ERROR_GET_CONFIG_EXCEPTION                                   => 500,
         self::ERROR_UPGRADE_APP_VERSION                                    => 500,
         self::ERROR_UPGRADE_AUTH_LEVEL                                     => 500,
+        self::ERROR_UPGRADE_AUTH_LOCK                                     => 500,
         self::ERROR_FORBIDDEN_USER_CANCEL_UNDERWAY                         => 403,
         self::ERROR_FORBIDDEN_USER_LOGOUT                                  => 403,
         self::ERROR_PASSWORD_OR_ACCOUNT                                    => 501,
@@ -128,6 +130,7 @@ class StatusConstants
 
     /** 状态码文案 **/
     const ERROR_TO_MSG_COPY = [
+        self::ERROR_UPGRADE_AUTH_LOCK => '用户已被锁定',
         self::ERROR_UPGRADE_AUTH_LEVEL => '请升级权限等级',
         self::ERROR_UPGRADE_APP_VERSION => 'Please Upgrade The Version',
         self::ERROR_NEED_UPGRADE => '您当前的版本过低，请更新到最新版本App',

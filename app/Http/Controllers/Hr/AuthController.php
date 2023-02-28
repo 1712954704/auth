@@ -23,7 +23,7 @@ class AuthController extends BaseController
      * 路由相关
      *
      */
-    public function rule()
+    public function rule_operate()
     {
         $auth_service = new AuthService();
         switch ($this->method) {
@@ -33,22 +33,22 @@ class AuthController extends BaseController
                 break;
             case 'POST': // 添加路由配置
                 // 检测参数
-                $data['name']            = $this->check_param('name');
-                $data['is_menu']            = $this->check_param('is_menu');  // 是否菜单
-                $data['title']         = $this->data_arr['title'] ?? '';
-                $data['remark']         = $this->data_arr['remark'] ?? '';
-                $data['pid']            = $this->check_param('pid',0);
-                $data = $auth_service->add_auth_rule($data);
+                $params['name']           = $this->check_param('name');
+                $params['is_menu']        = $this->check_param('is_menu');  // 是否菜单
+                $params['title']          = $this->data_arr['title'] ?? '';
+                $params['remark']         = $this->data_arr['remark'] ?? '';
+                $params['pid']            = $this->check_param('pid',0);
+                $data = $auth_service->add_auth_rule($params);
                 break;
             case 'PUT':  // 更新路由配置
                 // 检测参数
-                $id                    = $this->check_param('id');
-                $data['name']          = $this->data_arr['name'];
-                $data['is_menu']       = $this->data_arr['is_menu'];  // 是否菜单
-                $data['title']         = $this->data_arr['title'] ?? '';
-                $data['remark']        = $this->data_arr['remark'] ?? '';
-                $data['pid']           = $this->data_arr('pid',0);
-                $data = $auth_service->update_auth_rule($id,$data);
+                $id                    = $this->check_param('id'); // 主键id
+                $params['name']          = $this->data_arr['name'];
+                $params['is_menu']       = $this->data_arr['is_menu'];  // 是否菜单
+                $params['title']         = $this->data_arr['title'] ?? '';
+                $params['remark']        = $this->data_arr['remark'] ?? '';
+                $params['pid']           = $this->data_arr('pid',0);
+                $data = $auth_service->update_auth_rule($id,$params);
                 break;
             default:
                 return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL,'Invalid Method');

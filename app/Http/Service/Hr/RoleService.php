@@ -36,15 +36,15 @@ class RoleService extends ServiceBase
 
     /**
      * 添加角色
-     * @param array $data
+     * @param array $params
      * @param array $auth
      * @return mixed
      */
-    public function add_role($data,$auth = [])
+    public function add_role($params,$auth = [])
     {
         try {
             DB::beginTransaction();
-            $result = Role::create($data);
+            $result = Role::create($params);
             if (!$result){
                 throw new \Exception('DATABASE ERROR',StatusConstants::ERROR_DATABASE);
             }
@@ -74,15 +74,15 @@ class RoleService extends ServiceBase
     /**
      * 更新角色信息
      * @param int $id
-     * @param array $data
+     * @param array $params
      * @return mixed
      */
-    public function update_role($id,$data)
+    public function update_role($id,$params)
     {
         $where = [
             'id' => $id
         ];
-        $result = Role::where($where)->update($data);
+        $result = Role::where($where)->update($params);
         if (!$result){
             $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
         }

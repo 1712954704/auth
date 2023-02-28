@@ -56,4 +56,15 @@ class UserManager extends ManagerBase
     }
 
 
+    /**
+     * 需要用到账号的地方，处理账号大小写问题
+     * @param $key
+     * @param $account
+     */
+    public function get_last_key($key,$account){
+        return sprintf($key,strtolower($account));
+    }
+
+
+
 }
