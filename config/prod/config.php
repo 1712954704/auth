@@ -16,6 +16,12 @@ return [
     'sms_mob_limit_expire' => 86400, // 针对手机号获取验证码次数限制key过期时间
     'sms_ip_limit' => 100, // 针对ip获取验证码次数限制
     'sms_ip_limit_expire' => 86400, // 针对ip获取验证码次数限制key过期时间
+    'system_type' => [
+        1 => 'hr'
+    ],   // 系统类型对照表
+    'no_login' => [
+        'api/login'
+    ],  // 免登录接口
 
     /** 业务配置 */
     'is_singapore'                       => 0,

@@ -19,12 +19,12 @@ class UserController extends BaseController
 
     public function __construct()
     {
-        $path = Request::path();
-        $length = strripos($path,'/');
-        $function_name = substr($path,$length+1);
-        if ($function_name == 'login'){
-            $this->is_login = 0;
-        }
+//        $path = Request::path();
+//        $length = strripos($path,'/');
+//        $function_name = substr($path,$length+1);
+//        if ($function_name == 'login'){
+//            $this->is_login = 0;
+//        }
         parent::__construct();
     }
 
@@ -36,9 +36,21 @@ class UserController extends BaseController
 
         $user = new ServiceBase();
         $redis = $user->get_redis();
-        $fields = ['name','type'];
-        $list = $redis->hMGet('test_key',$fields);
-        var_dump($list);die();
+//        $data = ['hr' => ['api/home','api/login']];
+//        // 数组转json存储
+//        foreach($data as &$item){
+//            $item = json_encode($item);
+//        }
+//        $redis->hMSet('test_auth_key',$data);
+        $list = $redis->hGetAll('test_auth_key');
+        // 解码
+        foreach ($list as &$value){
+            $value = json_decode($value,true);
+        }
+        if (in_array('api/home',$list['hr'])){
+            var_dump(111);die();
+        }
+        var_dump($list['hr']);die();
 
 
 //        Redis::hmset('test_key',['type'=>'1']);
