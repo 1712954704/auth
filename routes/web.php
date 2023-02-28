@@ -28,7 +28,9 @@ Route::get('/ehr/user/{id}', function () {
 // BIO员工详情接口
 Route::get('/user/show/{id}', [EmployeesController::class, 'show']);
 // BIO员工登录接口
-Route::any('/login', [\App\Http\Controllers\common\LoginController::class, 'login']);
+Route::post('/login', [\App\Http\Controllers\common\LoginController::class, 'login']);
+Route::post('/logout', [\App\Http\Controllers\common\LoginController::class, 'logout']);
+
 
 
 

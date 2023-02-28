@@ -76,5 +76,23 @@ class LoginController extends Controller
 
 
     }
+    /**
+     * 退出
+     * @token
+     */
+    public function logout(Request $request)
+    {
+        $username = $request->input('username');
+        // 清空用户信息缓存
+        Redis::set('token_id', '');
+        Redis::set('token_key', '');
+
+        $response['code']  = '2';
+        $response['msg']   = '退出成功';
+
+        return json_encode($response);
+
+
+    }
 
 }
