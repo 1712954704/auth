@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * User: Jack
+ * Date: 2023/02/28
+ * Email: <1712954704@qq.com>
+ */
 namespace App\Models\Hr;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -39,5 +43,12 @@ class RoleAuthRule extends Authenticatable
      * @var bool
      */
     public $timestamps = false;
+
+    /**
+     * 可批量赋值的属性。
+     *
+     * @var array
+     */
+    protected $fillable = ['role_id','auth_rule_id'];
 
 }

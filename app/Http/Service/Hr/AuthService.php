@@ -1,15 +1,13 @@
 <?php
-
+/**
+ * User: Jack
+ * Date: 2023/02/28
+ * Email: <1712954704@qq.com>
+ */
 namespace App\Http\Service\Hr;
 
-use App\Http\Manager\Cache\UserManager;
-use App\Models\common\User;
-use App\Models\common\UserInfo;
-use App\Models\common\UserToken;
 use App\Models\Hr\AuthRule;
-use Illuminate\Support\Facades\Redis;
 use App\Http\Service\ServiceBase;
-use library\Constants\Model\UserConst;
 use library\Constants\StatusConstants;
 
 class AuthService extends ServiceBase
@@ -20,13 +18,13 @@ class AuthService extends ServiceBase
     }
 
     /**
-     * 添加路由规则
+     * 获取路由规则
      * @param array $data
      * @return mixed
      */
-    public function get_auth_rule($data)
+    public function get_auth_rule()
     {
-        $result = AuthRule::get($data);
+        $result = AuthRule::get();
         if (!$result){
             $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
         }
@@ -49,7 +47,7 @@ class AuthService extends ServiceBase
     }
 
     /**
-     * 添加路由规则
+     * 更新路由规则
      * @param int $id
      * @param array $data
      * @return mixed
