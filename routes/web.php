@@ -20,15 +20,16 @@ Route::get('/', function () {
 
 Route::get('/user', [UserController::class, 'index']);
 
-Route::get('/test', function () {
-    return ['test','id'];
-});
 
 Route::get('/ehr/user/{id}', function () {
     return ['test','id'];
 });
 
-// BIO 员工详情接口
+// BIO员工详情接口
 Route::get('/user/show/{id}', [EmployeesController::class, 'show']);
-Route::get('/add', [EmployeesController::class, 'add']);
+// BIO员工登录接口
+Route::any('/login', [\App\Http\Controllers\common\LoginController::class, 'login']);
+
+
+
 

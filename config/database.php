@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'mysql'),
+    'default' => env('DB_CONNECTION_COMMON', 'mysql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -45,16 +45,16 @@ return [
 
         'mysql_hr' => [ // hr数据库
             'driver' => 'mysql',
-            'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
-            'unix_socket' => env('DB_SOCKET', ''),
+            'url' => env('DATABASE_URL_HR'),
+            'host' => env('DB_HOST_HR', '127.0.0.1'),
+            'port' => env('DB_PORT_HR', '3306'),
+            'database' => env('DB_DATABASE_HR', 'forge'),
+            'username' => env('DB_USERNAME_HR', 'forge'),
+            'password' => env('DB_PASSWORD_HR', ''),
+            'unix_socket' => env('DB_SOCKET_HR', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
-            'prefix' => '',
+            'prefix' => 'hr_',
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
@@ -70,8 +70,8 @@ return [
             'port' => env('DB_PORT_COMMON', '3306'),
             'database' => env('DB_DATABASE_COMMON', 'forge'),
             'username' => env('DB_USERNAME_COMMON', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
-            'unix_socket' => env('DB_SOCKET', ''),
+            'password' => env('DB_PASSWORD_COMMON', ''),
+            'unix_socket' => env('DB_SOCKET_COMMON', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
             'prefix' => 'common_',
