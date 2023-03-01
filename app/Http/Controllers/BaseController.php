@@ -298,9 +298,9 @@ class BaseController
     public function __destruct()
     {
         //ip检测
-        $this->check_ip();
+//        $this->check_ip();
         //更新未操作过期时间
-        $this->update_no_action_time();
+//        $this->update_no_action_time();
         //调试日志
         // _C_NOT_FOUND_ACTION = 是否是未找到action的响应，如果是就不记录请求日志
 //        if (isset($this->my_config['flag']['write_debug']) && $this->my_config['flag']['write_debug'] && !isset($_SERVER['_C_NOT_FOUND_ACTION'])){
@@ -325,9 +325,9 @@ class BaseController
 
 //            $this->log_info("Backend request log", $this->request_log);
 //        }
-        if(ob_get_level()>0){
-            ob_end_flush();
-        }
+//        if(ob_get_level()>0){
+//            ob_end_flush();
+//        }
     }
 
 }
