@@ -36,9 +36,23 @@ class StructureService extends ServiceBase
         if ($name){
             $where['name'] = $name;
         }
-        $need_fields = ['id','name', 'number','code','type','area_name','build_time'];
-        $result = Structure::where($where)->offset($limit)->limit($offset)->select($need_fields)->get();
-        $this->return_data['data'] = \Common::laravel_to_array($result);
+        try {
+            $need_fields = ['id','name', 'number','code','type','area_id','build_time'];
+            $result = Structure::where($where)->offset($limit)->limit($offset)->select($need_fields)->get();
+            if (!$result){
+                throw new \Exception('',StatusConstants::ERROR_DATABASE);
+            }
+            $this->return_data['data'] = \Common::laravel_to_array($result);
+
+            $area_ids = array_column($this->return_data['data'],'area_id');
+            $region = \Common::laravel_to_array(Region::whereIn('id',$area_ids)->get());
+            $region_arr = array_column($region,'title','id');
+            foreach ($this->return_data['data'] as &$item){
+                $item['area_name'] = $region_arr[$item['area_id']];
+            }
+        }catch (\Exception $e){
+            $this->return_data['code'] = $e->getCode();
+        }
         return $this->return_data;
     }
 
@@ -53,7 +67,8 @@ class StructureService extends ServiceBase
         $where['id'] = $id;
         $data = ['status'=>$status];
         try {
-            $res = Structure::where($where)->find($id);
+//            $res = Structure::where($where)->find($id);
+            $res = Structure::find($id);
             if ($res){
                 throw new \Exception('',StatusConstants::ERROR_DATABASE_REPEAT_DELETE);
             }
