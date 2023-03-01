@@ -11,6 +11,10 @@ class Position extends Model
     use HasFactory;
     use SoftDeletes;
     protected $connection = 'mysql_hr';
-    protected $dateFormat = "m-d";
+    protected $guarded = [];
+
+    public static function find(int $id)
+    {
+    }
 
 }

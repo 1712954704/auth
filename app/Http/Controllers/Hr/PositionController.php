@@ -73,12 +73,26 @@ class PositionController extends Controller
     public function destroy($id)
     {
 
-        // $result = Position::find($id);
-        // $result->deleted_at  = 'Paris to London';
-        // $result->save();
-        $result  =  Position::destroy($id);
+        // Position::where('id',1)
+        //     ->update(['name' => '11999']);
 
-        $response['code'] = $result?'2':'200';
+
+        $result = DB::connection('mysql_hr')->table('positions')
+            ->where('id', $id)
+            ->update(['deleted_at' => time(),'updated_at'=>time()]);
+
+
+
+        // return time();
+        // $result = Position::find($id);
+        // $result->deleted_at  = 126;
+        // $result->save();
+        // $result  =  Position::destroy($id);
+
+
+
+
+        $response['code'] = $result?'200':'400';
         $response['msg']  = $result?'success':'数据不存在';
         $response['data'] = $result ;
         return json_encode($response);
