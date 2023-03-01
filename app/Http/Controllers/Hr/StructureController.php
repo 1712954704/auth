@@ -70,7 +70,7 @@ class StructureController extends BaseController
                 $params['phone']          = $this->data_arr['phone'] ?? '';  // 单位电话
                 $params['home_page']      = $this->data_arr['home_page'] ?? '';  // 单位主页
                 $data = $structure_service->update_structure($id,$params);
-
+                break;
             case 'DELETE':  // 删除组织
                 // 检测参数
                 $id                      = $this->check_param('id'); // 主键id
