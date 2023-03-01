@@ -67,7 +67,7 @@ class StructureService extends ServiceBase
     public function add_structure($params)
     {
         $result = Structure::insert($params);
-        if ($result){
+        if (!$result){
             $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
         }
         return $this->return_data;

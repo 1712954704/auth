@@ -114,13 +114,6 @@ class UserService extends ServiceBase
         $user_manager = new UserManager();
         $redis_key = $user_manager->get_user_auth_cache_key($user_id);
 
-//        // 数组转json存储
-//        $auth_data = ['hr'=>['*']];
-//        foreach($auth_data as &$item){
-//            $item = json_encode($item);
-//        }
-//        $this->_redis->hMSet($redis_key,$auth_data);  // 获取全部信息
-//        var_dump(111);die();
         // 使用token获取用户缓存信息
         if ($fields){
             $data = $this->_redis->hmget($redis_key,$fields);  // 获取全部信息

@@ -44,8 +44,8 @@ class StructureController extends BaseController
                 $params['build_time']     = $this->data_arr['build_time'] ?? null;  // 成立时间
                 $params['faxes']          = $this->data_arr['faxes'] ?? null;  // 单位传真
                 $params['address']        = $this->data_arr['address'] ?? null;  // 单位地址
-                $params['order']          = $this->data_arr['order'] ?? null;  // 排序
-                $params['remark']         = $this->data_arr['remark'] ?? null;  // 备注说明
+                $params['order']          = $this->data_arr['order'] ?? 0;  // 排序
+                $params['remark']         = $this->data_arr['remark'] ?? '';  // 备注说明
                 $params['short_name']     = $this->data_arr['short_name'] ?? '';  // 单位简称
                 $params['area_name']      = $this->check_param('area_name');  // 所属地区 todo 需要换成id表关联形式.做一个地址表 暂时用文字输入
                 $params['pid']            = $this->check_param('pid',0); // 上级单位
