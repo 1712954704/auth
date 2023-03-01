@@ -51,7 +51,12 @@ class StructureService extends ServiceBase
                 $item['area_name'] = $region_arr[$item['area_id']];
             }
         }catch (\Exception $e){
-            $this->return_data['code'] = $e->getCode();
+            $code = $e->getCode();
+            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+                $this->return_data['code'] = $code;
+            }else{
+                $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
+            }
         }
         return $this->return_data;
     }
@@ -76,7 +81,12 @@ class StructureService extends ServiceBase
                 throw new \Exception('',StatusConstants::ERROR_DATABASE);
             }
         }catch (\Exception $e){
-            $this->return_data['code'] = $e->getCode();
+            $code = $e->getCode();
+            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+                $this->return_data['code'] = $code;
+            }else{
+                $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
+            }
         }
         return $this->return_data;
     }
@@ -94,8 +104,13 @@ class StructureService extends ServiceBase
                 throw new \Exception('',StatusConstants::ERROR_DATABASE);
             }
         }catch (\Exception $e){
-            $this->return_data['code'] = $e->getCode();
-
+            $code = $e->getCode();
+            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+                $this->return_data['code'] = $code;
+            }else{
+                $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
+//                $this->return_data['msg'] = $e->getMessage();
+            }
         }
         return $this->return_data;
     }
@@ -115,7 +130,12 @@ class StructureService extends ServiceBase
                 throw new \Exception('',StatusConstants::ERROR_DATABASE);
             }
         }catch (\Exception $e){
-            $this->return_data['code'] = $e->getCode();
+            $code = $e->getCode();
+            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+                $this->return_data['code'] = $code;
+            }else{
+                $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
+            }
         }
         return $this->return_data;
     }
@@ -137,10 +157,14 @@ class StructureService extends ServiceBase
             $data = Region::where($where)->select($need_fields)->get();
             if (!$data){
                 throw new \Exception('',StatusConstants::ERROR_DATABASE);
-
             }
         }catch (\Exception $e){
-            $this->return_data['code'] = $e->getCode();
+            $code = $e->getCode();
+            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+                $this->return_data['code'] = $code;
+            }else{
+                $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
+            }
         }
         $this->return_data['data'] = \Common::laravel_to_array($data);
         return $this->return_data;
@@ -171,7 +195,12 @@ class StructureService extends ServiceBase
 
             }
         }catch (\Exception $e){
-            $this->return_data['code'] = $e->getCode();
+            $code = $e->getCode();
+            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+                $this->return_data['code'] = $code;
+            }else{
+                $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
+            }
         }
         $this->return_data['data'] = \Common::laravel_to_array($data);
         return $this->return_data;
