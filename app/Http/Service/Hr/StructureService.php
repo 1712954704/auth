@@ -51,9 +51,17 @@ class StructureService extends ServiceBase
     {
         $where['id'] = $id;
         $data = ['status'=>$status];
-        $result = Structure::where($where)->update($data);
-        if ($result){
-            $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
+        try {
+            $res = Structure::where($where)->find($id);
+            if ($res){
+                throw new \Exception('',StatusConstants::ERROR_DATABASE_REPEAT_DELETE);
+            }
+            $result = Structure::where($where)->update($data);
+            if (!$result){
+                throw new \Exception('',StatusConstants::ERROR_DATABASE);
+            }
+        }catch (\Exception $e){
+            $this->return_data['code'] = $e->getCode();
         }
         return $this->return_data;
     }
@@ -67,7 +75,7 @@ class StructureService extends ServiceBase
     public function add_structure($params)
     {
         $result = Structure::insert($params);
-        if ($result){
+        if (!$result){
             $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
         }
         return $this->return_data;
@@ -83,7 +91,7 @@ class StructureService extends ServiceBase
     {
         $where['id'] = $id;
         $result = Structure::where($where)->update($params);
-        if ($result){
+        if (!$result){
             $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
         }
         return $this->return_data;

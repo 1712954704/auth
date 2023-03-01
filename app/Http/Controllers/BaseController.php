@@ -65,6 +65,10 @@ class BaseController
         // 请求类型设置
         $this->method = $_SERVER['REQUEST_METHOD'] ?? '';
 
+
+
+        //获取全部参数
+//        $this->data_arr = \Common::getBodyParams();
         if ($this->method == 'GET') {
             $this->data_arr = $_GET;
         }
@@ -74,6 +78,7 @@ class BaseController
             }
             else {
                 $data = file_get_contents('php://input');
+
                 if ($data) {
                     $this->data_arr = json_decode($data,true);
                 }
@@ -132,7 +137,7 @@ class BaseController
         // 获取用户权限信息并验证
         $auth_result = $user_service->get_user_auth_info_by_id($check_result['data']['id'],[$this->my_config['system_type'][$this->system_type]]);
         // 是否拥有超级管理员权限
-        if (($auth_result[$this->my_config['system_type'][$this->system_type]] == '*') ||!in_array('*',$auth_result[$this->my_config['system_type'][$this->system_type]])){
+        if (!$auth_result || ($auth_result[$this->my_config['system_type'][$this->system_type]] == '*') ||!in_array('*',$auth_result[$this->my_config['system_type'][$this->system_type]])){
             // 验证路由及请求方式
             if (!in_array($this->route_at,$auth_result) || $auth_result[$this->route_at] != $this->method){
                 \Common::response_error_header(500, StatusConstants::ERROR_TO_MSG_COPY[StatusConstants::ERROR_UPGRADE_APP_VERSION]);
