@@ -48,7 +48,6 @@ class UserInfo extends Authenticatable
      * 获取用户信息的查询
      * @date 2023/02/27
      * @param $user_id
-     * @param null $status
      * @param string $field
      * @return bool|mixed
      */
