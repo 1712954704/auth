@@ -44,10 +44,16 @@ class PositionController extends Controller
     {
         // \Common::guid();
         // 检索，如果重复，会抛 `MultipleRecordsFoundException` 异常，并断言重复的条数...
-        $result  =  Position::where(['id'  =>  $id])->sole();
+        // $result  =  Position::where(['id'  =>  $id])->sole();
 
-        $response['code'] = $result?'2':'200';
-        $response['msg']  = $result?'success':'数据不存在';
+
+        $result = DB::connection('mysql_hr')->table('positions')
+            ->where('id', '=', $id)
+            ->where('deleted_at', '=', null)
+            ->get();
+
+        $response['code'] = $result==[]?'200':'204';
+        $response['msg']  = $result==[]?'success':'数据不存在';
         $response['data'] = $result ;
         return json_encode($response);
     }
@@ -73,24 +79,9 @@ class PositionController extends Controller
     public function destroy($id)
     {
 
-        // Position::where('id',1)
-        //     ->update(['name' => '11999']);
-
-
         $result = DB::connection('mysql_hr')->table('positions')
             ->where('id', $id)
             ->update(['deleted_at' => time(),'updated_at'=>time()]);
-
-
-
-        // return time();
-        // $result = Position::find($id);
-        // $result->deleted_at  = 126;
-        // $result->save();
-        // $result  =  Position::destroy($id);
-
-
-
 
         $response['code'] = $result?'200':'400';
         $response['msg']  = $result?'success':'数据不存在';
