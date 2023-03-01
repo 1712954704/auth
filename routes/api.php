@@ -42,6 +42,7 @@ Route::controller(\App\Http\Controllers\Hr\StructureController::class)->group(fu
     Route::post('/structure', 'structure_operate');   // 添加组织
     Route::put('/structure', 'structure_operate');   // 更新组织
     Route::delete('/structure', 'structure_operate');   // 删除组织架构
+    Route::get('/region', 'get_region');   // 获取地区信息
 });
 
 

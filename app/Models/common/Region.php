@@ -11,9 +11,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class UserToken extends Authenticatable
+class Region extends Authenticatable
 {
-//    use HasFactory;
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
@@ -28,7 +27,7 @@ class UserToken extends Authenticatable
      *
      * @var string
      */
-    protected $table = 'user_token';
+    protected $table = 'region';
 
     /**
      * 与数据表关联的主键.
@@ -43,5 +42,6 @@ class UserToken extends Authenticatable
      * @var bool
      */
     public $timestamps = false;
+
 
 }
