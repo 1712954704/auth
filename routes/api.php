@@ -35,3 +35,7 @@ Route::controller(RoleController::class)->group(function () {
     Route::post('/auth/change_user_role', 'change_user_role');   // 添加用户角色关联
     Route::put('/auth/change_user_role', 'change_user_role');   // 修改用户角色关联
 });
+
+Route::apiResource('department',\App\Http\Controllers\DepartmentController::class);
+Route::apiResource("hr/check",\App\Http\Controllers\Hr\CheckController::class);
+Route::apiResource("hr/position",\App\Http\Controllers\Hr\PositionController::class);
