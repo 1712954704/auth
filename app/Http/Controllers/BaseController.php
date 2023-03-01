@@ -22,7 +22,10 @@ class BaseController
 
     protected $route_at;  // 当前路由
 
+    protected $data_arr;  // 参数信息
+
     protected $user_info;  // 用户信息
+
     /**
      * 初始化
      * @param int $is_login 是否需要登录 1:是 0:否
@@ -41,6 +44,10 @@ class BaseController
 //            $this->write_request_info();
 //        }
 
+        if (\Common::is_cli()) {  // 是否是cli模式
+            goto END;
+        }
+
         //跨域
         $this->cross_domain();
 
@@ -56,7 +63,7 @@ class BaseController
         }
 
         // 请求类型设置
-        $this->method = $_SERVER['REQUEST_METHOD'];
+        $this->method = $_SERVER['REQUEST_METHOD'] ?? '';
 
         if ($this->method == 'GET') {
             $this->data_arr = $_GET;
@@ -85,6 +92,7 @@ class BaseController
             $this->check_auth($token);
         }
 
+        END:
     }
 
     /**
