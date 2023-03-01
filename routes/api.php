@@ -38,3 +38,4 @@ Route::controller(RoleController::class)->group(function () {
 
 Route::apiResource('department',\App\Http\Controllers\DepartmentController::class);
 Route::apiResource("hr/check",\App\Http\Controllers\Hr\CheckController::class);
+Route::apiResource("hr/position",\App\Http\Controllers\Hr\PositionController::class);
