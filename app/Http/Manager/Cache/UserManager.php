@@ -31,7 +31,6 @@ class UserManager extends ManagerBase
      */
     public function get_user_auth_cache_key($user_id)
     {
-//        $user_id = \CacheConstants::HASH_USER_AUTH_INFO_PREFIX . $user_id;
         $user_id = UserConstants::HASH_USER_AUTH_INFO_PREFIX . $user_id;
         return $user_id;
     }
