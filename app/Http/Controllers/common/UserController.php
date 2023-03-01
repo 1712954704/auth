@@ -49,7 +49,8 @@ class UserController extends BaseController
                 // 检测参数
                 $account        = $this->check_param('account');  // 账号
                 $pwd            = $this->check_param('pwd');  // 密码
-                $data = $user_service->login($account,$pwd);
+                $type            = $this->check_param('type');  // 登录系统类型
+                $data = $user_service->login($account,$pwd,$type);
                 break;
             default:
                 return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL,'Invalid Method');

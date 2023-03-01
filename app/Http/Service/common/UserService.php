@@ -207,7 +207,6 @@ class UserService extends ServiceBase
         if (empty($token)) return 0;
         // 一个小时刷新一次，避免频繁刷新
         if ((time() - $refresh_token_time) >= 3600) {
-//            return $this->get_redis()->expire($this->get_token_key($token), $expire_time);
             $user_manager = new UserManager();
             return $this->_redis->expire($user_manager->get_token_key($token), $expire_time);
         }
@@ -220,13 +219,15 @@ class UserService extends ServiceBase
      *
      * @param string $account
      * @param string $pwd
+     * @param string $type 登录系统类型
      * @return array
      */
-    public function login($account,$pwd)
+    public function login($account,$pwd,$type)
     {
         try {
             // 检测用户是否锁定
             $key = $this->get_last_key(UserConstants::HASH_USER_LOGIN_LIMIT,$account);
+            $expire_time = \Common::get_config('user_safe')['login_fail_lock_time'];
             $is_lock = $this->_redis->hMGet($key,'is_lock')['is_lock'] ?? 0;
             if ($is_lock == 1){
                 throw new \Exception('',StatusConstants::ERROR_UPGRADE_AUTH_LOCK);
@@ -242,7 +243,6 @@ class UserService extends ServiceBase
             }
             // 检测密码
             if ($user_info->pwd != sha1($user_info->salt.sha1($pwd))){
-                $expire_time = \Common::get_config('user_safe')['login_fail_lock_time'];
                 // 密码错误次数记录 超过次数则锁定
                 $this->user_login_limit($expire_time,$account,UserConstants::USER_LOGIN_LIMIT_TYPE_ERROR);
                 throw new \Exception('',StatusConstants::ERROR_PASSWORD_CHECK_FAIL);
@@ -261,8 +261,19 @@ class UserService extends ServiceBase
             }else{
                 UserToken::where($where)->insert($token_data);
             }
-
-
+            $user_manager = new UserManager();
+            $token_key = $user_manager->get_token_key($result->token);
+            // 查询旧token是否存在,并删除 创建新token保存
+            if ($this->_redis->exists($token_key)){
+                $this->_redis->del($token_key);
+            }
+            $data = [
+                'id' => $user_info->id,
+                'type' => $type,
+            ];
+            $this->_redis->hmset($token_key,$data);  // 设置token信息
+            // 登录成功操作处理
+            $this->user_login_limit($expire_time,$account,UserConstants::USER_LOGIN_LIMIT_TYPE_SUCCESS);
         }catch (\Exception $e){
             $this->return_data['code'] = $e->getCode();
             $this->return_data['msg'] = $e->getMessage();
