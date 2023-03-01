@@ -106,14 +106,21 @@ class UserService extends ServiceBase
     /**
      * 根据用户id获取用户权限信息
      * @param string $token 用户token
-     * @param string $fields 字段名
+     * @param array $fields 字段名
      * @return array
      */
-    public function get_user_auth_info_by_id($user_id,$fields='')
+    public function get_user_auth_info_by_id($user_id,$fields=[])
     {
         $user_manager = new UserManager();
         $redis_key = $user_manager->get_user_auth_cache_key($user_id);
 
+//        // 数组转json存储
+//        $auth_data = ['hr'=>['*']];
+//        foreach($auth_data as &$item){
+//            $item = json_encode($item);
+//        }
+//        $this->_redis->hMSet($redis_key,$auth_data);  // 获取全部信息
+//        var_dump(111);die();
         // 使用token获取用户缓存信息
         if ($fields){
             $data = $this->_redis->hmget($redis_key,$fields);  // 获取全部信息
@@ -135,7 +142,7 @@ class UserService extends ServiceBase
 
         // 解码
         foreach ($data as &$value){
-            $value = strtolower(json_decode($value,true));
+            $value = json_decode($value,true);
         }
 
         return $data;
@@ -153,7 +160,7 @@ class UserService extends ServiceBase
     public function _inner_get_user_info_for_cache($user_id)
     {
         $user_model = new User();
-        $user = $user_model->get_user_by_id($user_id,UserConst::COMMON_STATUS_NORMAL);
+        $user = $user_model->get_user_by_id($user_id,UserConstants::COMMON_STATUS_NORMAL);
 
         if (empty($user)) {
             return array();
@@ -166,6 +173,9 @@ class UserService extends ServiceBase
         if (empty($user_info)){
             return array();
         }
+
+        $user = \Common::laravel_to_array($user);
+        $user_info = \Common::laravel_to_array($user_info);
         // 合并用户信息数组
         $user_info = array_merge($user,$user_info);
 

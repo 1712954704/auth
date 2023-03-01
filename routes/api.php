@@ -36,6 +36,15 @@ Route::controller(RoleController::class)->group(function () {
     Route::put('/auth/change_user_role', 'change_user_role');   // 修改用户角色关联
 });
 
+
+Route::controller(\App\Http\Controllers\Hr\StructureController::class)->group(function () {
+    Route::get('/structure', 'structure_operate');   // 获取组织架构列表
+    Route::post('/structure', 'structure_operate');   // 添加组织
+    Route::put('/structure', 'structure_operate');   // 更新组织
+    Route::delete('/structure', 'structure_operate');   // 删除组织架构
+});
+
+
 Route::apiResource('department',\App\Http\Controllers\DepartmentController::class);
 Route::apiResource("hr/check",\App\Http\Controllers\Hr\CheckController::class);
 Route::apiResource("hr/position",\App\Http\Controllers\Hr\PositionController::class);

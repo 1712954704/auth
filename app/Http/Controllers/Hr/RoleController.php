@@ -7,7 +7,6 @@
 namespace App\Http\Controllers\Hr;
 
 use App\Http\Controllers\BaseController;
-use App\Http\Service\Hr\AuthService;
 use App\Http\Service\Hr\RoleService;
 use library\Constants\StatusConstants;
 
