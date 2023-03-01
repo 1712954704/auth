@@ -38,7 +38,10 @@ Route::controller(RoleController::class)->group(function () {
 
 
 Route::controller(\App\Http\Controllers\Hr\StructureController::class)->group(function () {
-    Route::get('/structure/list', 'structure_operate');   // 获取组织架构列表
+    Route::get('/structure', 'structure_operate');   // 获取组织架构列表
+    Route::post('/structure', 'structure_operate');   // 添加组织
+    Route::put('/structure', 'structure_operate');   // 更新组织
+    Route::delete('/structure', 'structure_operate');   // 删除组织架构
 });
 
 
