@@ -36,7 +36,7 @@ class StructureService extends ServiceBase
         if ($name){
             $where['name'] = $name;
         }
-        $need_fields = ['name', 'number','code','type','area_name','build_time'];
+        $need_fields = ['id','name', 'number','code','type','area_name','build_time'];
         $result = Structure::where($where)->offset($limit)->limit($offset)->select($need_fields)->get();
         $this->return_data['data'] = \Common::laravel_to_array($result);
         return $this->return_data;
