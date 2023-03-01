@@ -15,6 +15,13 @@ define('LARAVEL_START', microtime(true));
 |
 */
 
+// 定义根路径
+define('ROOT_PATH', dirname(dirname(__FILE__)) . '/');
+// 如果存在环境常量
+//if (file_exists(ROOT_PATH . 'env.php')) {
+//    require_once ROOT_PATH . 'env.php';
+//}
+
 // 容错处理，假如没有环境常量，默认为生产环境，防止上线时还未配置环境常量导致找不到配置报错
 !defined('PHP_ENV') && define('PHP_ENV', 'prod');
 // 定义配置文件路径
