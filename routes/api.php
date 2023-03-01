@@ -43,6 +43,7 @@ Route::controller(\App\Http\Controllers\Hr\StructureController::class)->group(fu
     Route::put('/structure', 'structure_operate');   // 更新组织
     Route::delete('/structure', 'structure_operate');   // 删除组织架构
     Route::get('/region', 'get_region');   // 获取地区信息
+    Route::get('/structure/group', 'get_group_list');   // 获取上级单位信息
 });
 
 

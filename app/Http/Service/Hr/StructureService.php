@@ -67,7 +67,6 @@ class StructureService extends ServiceBase
         $where['id'] = $id;
         $data = ['status'=>$status];
         try {
-//            $res = Structure::where($where)->find($id);
             $res = Structure::find($id);
             if ($res){
                 throw new \Exception('',StatusConstants::ERROR_DATABASE_REPEAT_DELETE);
@@ -84,8 +83,7 @@ class StructureService extends ServiceBase
 
     /**
      * 添加组织
-     * @param array $id 主键id
-     * @param int $status 默认为 -1=已删除
+     * @param array $params
      * @return array
      */
     public function add_structure($params)
@@ -104,8 +102,8 @@ class StructureService extends ServiceBase
 
     /**
      * 更新组织列信息
-     * @param array $id 主键id
-     * @param int $status 默认为 -1=已删除
+     * @param int $id 主键id
+     * @param array $params
      * @return array
      */
     public function update_structure($id,$params)
@@ -124,7 +122,7 @@ class StructureService extends ServiceBase
 
     /**
      * 获取地区信息
-     * @param array $id 主键id
+     * @param int $id 主键id
      * @return array
      */
     public function get_region($id)
@@ -137,6 +135,37 @@ class StructureService extends ServiceBase
             ];
             $need_fields = ['id','title','level','pid'];
             $data = Region::where($where)->select($need_fields)->get();
+            if (!$data){
+                throw new \Exception('',StatusConstants::ERROR_DATABASE);
+
+            }
+        }catch (\Exception $e){
+            $this->return_data['code'] = $e->getCode();
+        }
+        $this->return_data['data'] = \Common::laravel_to_array($data);
+        return $this->return_data;
+    }
+
+    /**
+     * 获取地区信息
+     * @param int $id 主键id
+     * @param int $group_type 组织部门类型
+     * @return array
+     */
+    public function get_group_list($id = 0,$group_type)
+    {
+        try {
+            $data = [];
+            $where = [
+                'group_type' => $group_type,
+            ];
+            $need_fields = ['id','name','short_name'];
+            if (!empty($id)){
+                $where ['pid'] = $id;
+            }else{
+                $where ['depth'] = 1;
+            }
+            $data = Structure::where($where)->select($need_fields)->get();
             if (!$data){
                 throw new \Exception('',StatusConstants::ERROR_DATABASE);
 
