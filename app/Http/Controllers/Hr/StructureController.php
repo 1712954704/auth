@@ -7,9 +7,7 @@
 namespace App\Http\Controllers\Hr;
 
 use App\Http\Controllers\BaseController;
-use App\Http\Service\Hr\RoleService;
 use App\Http\Service\Hr\StructureService;
-use library\Constants\Model\ModelConstants;
 use library\Constants\StatusConstants;
 
 class StructureController extends BaseController
@@ -82,4 +80,22 @@ class StructureController extends BaseController
         return \Common::format_return_result($data['code'],$data['msg'],$data['data']);
     }
 
+    /**
+     * 组织架构相关
+     *
+     */
+    public function get_region()
+    {
+        $structure_service = new StructureService();
+        switch ($this->method) {
+            case 'GET':  // 获取组织架构列表
+                // 检测参数
+                $id  = $this->get_safe_int_param('id',1);
+                $data = $structure_service->get_region($id);
+                break;
+            default:
+                return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL,'Invalid Method');
+        }
+        return \Common::format_return_result($data['code'],$data['msg'],$data['data']);
+    }
 }
