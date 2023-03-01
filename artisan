@@ -15,6 +15,11 @@ define('LARAVEL_START', microtime(true));
 |
 */
 
+// 容错处理，假如没有环境常量，默认为生产环境，防止上线时还未配置环境常量导致找不到配置报错
+!defined('PHP_ENV') && define('PHP_ENV', 'prod');
+// 定义配置文件路径
+define('CONFIG_PATH', ROOT_PATH . 'config/'.PHP_ENV.'/');
+
 require __DIR__.'/vendor/autoload.php';
 
 $app = require_once __DIR__.'/bootstrap/app.php';

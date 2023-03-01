@@ -241,13 +241,27 @@ class UserService extends ServiceBase
                 throw new \Exception('',StatusConstants::ERROR_PASSWORD_OR_ACCOUNT);
             }
             // 检测密码
-            if ($user_info['pwd'] != sha1($user_info['salt'].sha1($pwd))){
+            if ($user_info->pwd != sha1($user_info->salt.sha1($pwd))){
                 $expire_time = \Common::get_config('user_safe')['login_fail_lock_time'];
                 // 密码错误次数记录 超过次数则锁定
                 $this->user_login_limit($expire_time,$account,UserConstants::USER_LOGIN_LIMIT_TYPE_ERROR);
                 throw new \Exception('',StatusConstants::ERROR_PASSWORD_CHECK_FAIL);
             }
-            // 更新用户token
+            // 更新用户token 1.生成用户token 2.查询用户token是否存在,存在更新不存在则创建
+            $where = [
+                'user_id' => $user_info->id,
+            ];
+            $result = UserToken::where($where)->first();
+            $token_data = [
+                'token' => \Common::gen_token(),
+                'status' => UserConstants::COMMON_STATUS_NORMAL,
+            ];
+            if ($result){
+                UserToken::where($where)->updated($token_data);
+            }else{
+                UserToken::where($where)->insert($token_data);
+            }
+
 
         }catch (\Exception $e){
             $this->return_data['code'] = $e->getCode();
