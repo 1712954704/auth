@@ -18,7 +18,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/user', [UserController::class, 'index']);
+//Route::get('/user', [UserController::class, 'index']);
 
 
 Route::get('/ehr/user/{id}', function () {
