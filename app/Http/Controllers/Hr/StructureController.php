@@ -32,7 +32,8 @@ class StructureController extends BaseController
                 $params['limit']  = $this->get_safe_int_param('limit',0);
                 $params['offset'] = $this->get_safe_int_param('offset',10);
                 $params['name']   = $this->data_arr['name'] ?? '';
-                $data = $structure_service->get_list($params);
+                $id               = $this->check_param('id',0);     // 主键id
+                $data = $structure_service->get_list($params,$id);
                 break;
             case 'POST':  // 添加组织
                 // 检测参数
