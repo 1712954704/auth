@@ -24,7 +24,8 @@ use \App\Http\Controllers\Common\UserController;
 
 Route::controller(UserController::class)->group(function () {
     Route::post('/user/login', 'login');   // 登录
-    Route::get('/user/info', 'login');   // 登录
+    Route::get('/user/info', 'user_info');   // 获取用户信息
+    Route::get('/user/register', 'register');   // 用户新增
 });
 
 Route::controller(AuthController::class)->group(function () {

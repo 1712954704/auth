@@ -65,7 +65,6 @@ class UserController extends BaseController
     }
 
 
-
     /**
      * 注册
      */
@@ -75,7 +74,12 @@ class UserController extends BaseController
         switch ($this->method) {
             case 'POST': // 添加路由配置
                 // 检测参数
-                $params = $this->check_param('account');  // 账号
+                $params['account'] = $this->check_param('account');  // 账号
+                $params['name'] = $this->check_param('name');  // 姓名
+                $params['job_number'] = $this->check_param('job_number');  // 员工工号
+                $params['email'] = $this->check_param('email');  // 邮箱
+                $params['gender'] = $this->check_param('gender');  // 性别
+                $params['email'] = $this->check_param('email');  // 邮箱
 
                 $data = $user_service->register($params);
                 break;

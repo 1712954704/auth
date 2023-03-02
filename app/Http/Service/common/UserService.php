@@ -281,6 +281,7 @@ class UserService extends ServiceBase
             $this->_redis->hmset($new_token_key,$data);  // 设置token信息
             // 登录成功操作处理
             $this->user_login_limit($expire_time,$account,UserConstants::USER_LOGIN_LIMIT_TYPE_SUCCESS);
+            $this->return_data['data']['token'] = $token_data['token'];
         }catch (\Exception $e){
             $this->return_data['code'] = $e->getCode();
             $this->return_data['msg'] = $e->getMessage();
