@@ -249,8 +249,17 @@ class UserService extends ServiceBase
             // 检测密码
             if ($user_info->pwd != sha1($user_info->salt.sha1($pwd))){
                 // 密码错误次数记录 超过次数则锁定
-                $this->user_login_limit($expire_time,$account,UserConstants::USER_LOGIN_LIMIT_TYPE_ERROR);
-                throw new \Exception('',StatusConstants::ERROR_PASSWORD_CHECK_FAIL);
+                $lock_data = $this->user_login_limit($expire_time,$account,UserConstants::USER_LOGIN_LIMIT_TYPE_ERROR);
+                $login_verify_num = \Common::get_config('user_safe')['login_verify_num'];
+                $login_lock_num = \Common::get_config('user_safe')['login_lock_num'];
+                if ($lock_data['num'] >= $login_verify_num && $lock_data['num'] < $login_lock_num){
+                    throw new \Exception('',StatusConstants::ERROR_PASSWORD_CHECK_FAIL);
+                }elseif ($lock_data['num'] >= $login_lock_num){
+                    $this->lock_user(\Common::laravel_to_array($user_info));
+                    throw new \Exception('',StatusConstants::ERROR_UPGRADE_AUTH_LOCK);
+                }else{
+                    throw new \Exception('',StatusConstants::ERROR_PASSWORD_CHECK_FAIL);
+                }
             }
             // 更新用户token 1.生成用户token 2.查询用户token是否存在,存在更新不存在则创建
             $where = [
@@ -311,6 +320,10 @@ class UserService extends ServiceBase
                 //有效期12小时3600*12
                 $this->_redis->expire($key, $expire_time);
             }
+            $data = [
+                'num' => $result,
+                'is_lock' => $result['is_lock'] ?? 0,
+            ];
         } else if ($type == 2) {
             //重置redis值
             $this->_redis->hMSet($key, [
@@ -328,6 +341,24 @@ class UserService extends ServiceBase
             }
         }
         return $data;
+    }
+
+    /**
+     * 锁定用户
+     * @param array $user_info
+     * @return mixed
+    */
+    public function lock_user($user_info)
+    {
+//        $user_manager = new UserManager();
+//        $account = $user_info['account'];
+//        $expire_time = \Common::get_config('user_safe')['login_fail_lock_time'];
+//        $key = $user_manager->get_last_key(UserConstants::HASH_USER_LOGIN_LIMIT,$account);
+//        $this->_redis->hMSet($key, ['is_lock' => 1]);
+//        //有效期12小时3600*12
+//        $this->_redis->expire($key, $expire_time);
+        // 用户锁定操作 todo 后续需要修改为mq异步操作
+        User::where('id',$user_info['id'])->update(['status'=>UserConstants::COMMON_STATUS_LOCK]);
     }
 
     /**

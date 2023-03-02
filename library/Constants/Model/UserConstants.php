@@ -17,6 +17,11 @@ class UserConstants extends ModelConstants
     const USER_LOGIN_LIMIT_TYPE_SUCCESS = 2; //用户登录、登出成功
     const USER_LOGIN_LIMIT_TYPE_INFO = 3; //用户登录信息
 
+    /**
+     * 数据状态常量
+    */
+    const COMMON_STATUS_LOCK = 2;      // 状态 - 锁定
+    const COMMON_STATUS_DISABLE = 3;      // 状态 - 禁用
 
 
     /**

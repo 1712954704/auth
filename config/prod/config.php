@@ -27,8 +27,11 @@ return [
     'is_singapore'                       => 0,
     //用户安全
     'user_safe'=>[
+        'login_verify_num'                    => 3,  // 用户密码登录错误超过次数开启验证码
         'login_lock_num'                      => 6,  // 用户密码登录错误超过锁定次数
         'login_fail_lock_time'=>CacheConstants::CACHE_EXPIRE_TIME_TWELVE_HOURS,//登录失败账号锁定12小时
     ],
+
+    'img_domain_url'=>'https://www.bio-cloud.com.cn/img/', // 图片域名地址
 
 ];

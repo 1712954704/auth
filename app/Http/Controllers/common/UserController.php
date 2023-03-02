@@ -79,7 +79,17 @@ class UserController extends BaseController
                 $params['job_number'] = $this->check_param('job_number');  // 员工工号
                 $params['email'] = $this->check_param('email');  // 邮箱
                 $params['gender'] = $this->check_param('gender');  // 性别
-                $params['email'] = $this->check_param('email');  // 邮箱
+                $params['structure_id'] = $this->check_param('structure_id');  // 所属组织
+                $params['department_id'] = $this->check_param('department_id');  // 所属部门
+                $params['manager_id'] = $this->check_param('manager_id');  // 所属主管
+                $params['position_id'] = $this->data_arr['position_id'];  // 所属岗位
+                $params['role_id'] = $this->data_arr['role_id'];  // 所属角色 数组形式 可以有多个角色
+                $params['position_id'] = $this->data_arr['position_id'];  // 所属岗位
+                $params['job_type'] = $this->data_arr['job_type'];  // 用户类型 1=在职 2=离职
+                $params['status'] = $this->data_arr['status'];  // 状态 1=在职 2=离职
+                $params['position_id'] = $this->data_arr['position_id'];  // 所属岗位
+
+
 
                 $data = $user_service->register($params);
                 break;

@@ -16,6 +16,8 @@ define('ROOT_PATH', dirname(dirname(__FILE__)) . '/');
 !defined('PHP_ENV') && define('PHP_ENV', 'prod');
 // 定义配置文件路径
 define('CONFIG_PATH', ROOT_PATH . 'config/'.PHP_ENV.'/');
+////加载配置文件
+//define('GET_CONFIG', require_once KERNEL_DIR . '/../env_conf/'.PHP_ENV.'/config.php');
 
 /*
 |--------------------------------------------------------------------------
