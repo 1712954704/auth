@@ -332,7 +332,7 @@ class UserService extends ServiceBase
      * @param string $system_type  系统类型
      * @return array
      */
-    public function get_user_info($token,$system_type)
+    public function user_info($token,$system_type)
     {
         // 验证token是否存在
         $token_result = $this->get_user_info_by_token($token);
