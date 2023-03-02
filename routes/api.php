@@ -54,6 +54,6 @@ Route::controller(\App\Http\Controllers\Hr\StructureController::class)->group(fu
 });
 
 
-Route::apiResource('department',\App\Http\Controllers\DepartmentController::class);
+Route::apiResource('department',\App\Http\Controllers\common\DepartmentController::class);
 Route::apiResource("hr/check",\App\Http\Controllers\Hr\CheckController::class);
 Route::apiResource("hr/position",\App\Http\Controllers\Hr\PositionController::class);
