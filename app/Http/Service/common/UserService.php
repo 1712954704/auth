@@ -324,4 +324,43 @@ class UserService extends ServiceBase
         return $data;
     }
 
+    /**
+     * 获取用户信息包含权限个及个人配置等
+     * @author jack
+     * @dateTime 2023-03-02 13:21
+     * @param string $token         用户token
+     * @param string $system_type  系统类型
+     * @return array
+     */
+    public function get_user_info($token,$system_type)
+    {
+        // 验证token是否存在
+        $token_result = $this->get_user_info_by_token($token);
+        $user_id = $token_result['data']['id'];
+        // 获取用户权限缓存信息
+        $my_config = \Common::get_config();
+        $auth_result = $this->get_user_auth_info_by_id($user_id,[$my_config[$system_type]]);
+        // 获取用户信息缓存
+        $user_info = $this->get_user_info_by_id($user_id);
+
+        // 合并用户信息数组
+        $info = array_merge($auth_result,$user_info);
+
+        return [];
+    }
+
+
+    /**
+     * 注册
+     * @author jack
+     * @dateTime 2023-03-02 11:32
+     * @param array $params
+     * @return mixed
+     */
+    public function register($params)
+    {
+
+    }
+
+
 }

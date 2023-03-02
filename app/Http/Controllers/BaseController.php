@@ -24,11 +24,12 @@ class BaseController
 
     protected $data_arr;  // 参数信息
 
+    protected $token;  // 用户token
+
     protected $user_info;  // 用户信息
 
     /**
      * 初始化
-     * @param int $is_login 是否需要登录 1:是 0:否
      * @param string $token     token
      * @return mixed
     */
@@ -127,7 +128,7 @@ class BaseController
                 \Common::response_error_header(401, 'invalid token 2');
             }
         }
-
+        $this->token = $token;
         $user_service = new UserService();
         $check_result = $user_service->get_user_info_by_token($token);
         if ($check_result['code'] != 200){ // token错误

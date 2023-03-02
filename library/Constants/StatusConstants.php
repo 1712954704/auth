@@ -70,6 +70,8 @@ class StatusConstants
 
     // 数据冲突
     const ERROR_DATA_CONFLICT = 40900;
+    const ERROR_DATA_CONFLICT_CHILD_EXIST = 40901;  // 数据下有子集不能删除
+
 
     //版本过低
     const ERROR_VERSION_OUTDATED = 43101;
@@ -93,6 +95,7 @@ class StatusConstants
         self::ERROR_NOT_FOUND                                              => 404,
         self::ERROR_NOT_FOUND_USER_INFO                                    => 404,
         self::ERROR_DATA_CONFLICT                                          => 409,
+        self::ERROR_DATA_CONFLICT_CHILD_EXIST                              => 409,
         self::ERROR_DATABASE                                               => 500,
         self::ERROR                                                        => 500,
         self::ERROR_GENERATE_CACHE_FAILED                                  => 500,
@@ -132,7 +135,9 @@ class StatusConstants
 
     /** 状态码文案 **/
     const ERROR_TO_MSG_COPY = [
-        self::ERROR_DATABASE_REPEAT_DELETE => '数据不能重复删除',
+        self::ERROR_DATA_CONFLICT => 'Data Conflict',
+        self::ERROR_DATA_CONFLICT_CHILD_EXIST => 'Child Exist',
+        self::ERROR_DATABASE_REPEAT_DELETE => 'Repeat Delete',
         self::ERROR_UPGRADE_AUTH_LOCK => '用户已被锁定',
         self::ERROR_UPGRADE_AUTH_LEVEL => '请升级权限等级',
         self::ERROR_UPGRADE_APP_VERSION => 'Please Upgrade The Version',

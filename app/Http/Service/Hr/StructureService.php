@@ -108,7 +108,7 @@ class StructureService extends ServiceBase
             }
             $data = ['status'=>$status];
             $res = Structure::whereIn('id',$ids)->get();
-            $normal_arr = $error_arr = [];
+            $child_arr = $normal_arr = $error_arr = [];
             // 获取状态正常的删除 status=1
             foreach ($res as $item){
                 if ($item->status == ModelConstants::COMMON_STATUS_NORMAL){
@@ -117,13 +117,28 @@ class StructureService extends ServiceBase
                     $error_arr[] = $item->id;
                 }
             }
+            // 检测是否有子集
+            foreach ($normal_arr as $key => $value){
+                $get_result = Structure::where(['pid'=>$value])->get();
+                $get_result = \Common::laravel_to_array($get_result);
+                if ($get_result){
+                    $child_arr[] = $value;
+                    unset($normal_arr[$key]);
+                }
+            }
             if ($normal_arr){
                 $result = Structure::whereIn('id',$normal_arr)->update($data);
                 if (!$result){
                     throw new \Exception('',StatusConstants::ERROR_DATABASE);
                 }
             }
-            if ($error_arr){
+            if ($error_arr && $child_arr){
+                $this->return_data['data']['error_arr'] = array_merge($error_arr,$child_arr);
+                $this->return_data['code'] = StatusConstants::ERROR_DATA_CONFLICT;
+            }elseif ($child_arr){
+                $this->return_data['data']['error_arr'] = $child_arr;
+                $this->return_data['code'] = StatusConstants::ERROR_DATA_CONFLICT_CHILD_EXIST;
+            }elseif ($error_arr){
                 $this->return_data['data']['error_arr'] = $error_arr;
                 $this->return_data['code'] = StatusConstants::ERROR_DATABASE_REPEAT_DELETE;
             }
