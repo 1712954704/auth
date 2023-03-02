@@ -29,11 +29,12 @@ class StructureController extends BaseController
         switch ($this->method) {
             case 'GET':  // 获取组织架构列表
                 // 检测参数
-                $params['limit']  = $this->get_safe_int_param('limit',0);
-                $params['offset'] = $this->get_safe_int_param('offset',10);
+                $page             = $this->get_safe_int_param('page',1);
+                $limit            = $this->get_safe_int_param('limit',10);
                 $params['name']   = $this->data_arr['name'] ?? '';
-                $id               = $this->check_param('id',0);     // 主键id
-                $data = $structure_service->get_list($params,$id);
+                $id               = $this->data_arr['id'] ?? null;     // 主键id
+                $offset  = ($page - 1) * $limit;
+                $data = $structure_service->get_list($params,$id,$offset,$limit);
                 break;
             case 'POST':  // 添加组织
                 // 检测参数

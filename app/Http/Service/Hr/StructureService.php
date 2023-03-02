@@ -25,13 +25,13 @@ class StructureService extends ServiceBase
      *      name => xxx   // 待搜索的值
      * ]
      * @param int $id
+     * @param int $offset
+     * @param int $limit
      * @return array
      */
-    public function get_list($params,$id)
+    public function get_list($params,$id = null,$offset = 0,$limit = 10)
     {
         $name = $params['name'] ?? '';
-        $limit = $params['limit'] ?? 0;
-        $offset = $params['offset'] ?? 10;
         $where = [];
         $where['status'] = ModelConstants::COMMON_STATUS_NORMAL;
         if ($name){
@@ -42,8 +42,8 @@ class StructureService extends ServiceBase
         }
 
         try {
-            $need_fields = ['id','name', 'number','code','type','area_id','build_time','faxes','address','order','remark','short_name','phone','home_page'];
-            $result = Structure::where($where)->offset($limit)->limit($offset)->select($need_fields)->get();
+            $need_fields = ['id','name', 'number','code','type','area_id','build_time','faxes','address','order','remark','short_name','phone','home_page','pid'];
+            $result = Structure::where($where)->offset($offset)->limit($limit)->select($need_fields)->get();
             $this->return_data['data']['count'] = Structure::where($where)->count();
             if (!$result){
                 throw new \Exception('',StatusConstants::ERROR_DATABASE);

@@ -39,10 +39,6 @@ class UserController extends BaseController
     {
         // 验证 ip地址 (公司内部使用)
 
-        // 验证登录信息 (用户名,密码)
-
-        // 刷新用户信息缓存
-
         $user_service = new UserService();
         switch ($this->method) {
             case 'POST': // 添加路由配置
