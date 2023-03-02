@@ -228,10 +228,12 @@ class UserService extends ServiceBase
     public function login($account,$pwd,$type)
     {
         try {
+            $user_manager = new UserManager();
+            $my_config = \Common::get_config();
             // 检测用户是否锁定
-            $key = $this->get_last_key(UserConstants::HASH_USER_LOGIN_LIMIT,$account);
+            $key = $user_manager->get_last_key(UserConstants::HASH_USER_LOGIN_LIMIT,$account);
             $expire_time = \Common::get_config('user_safe')['login_fail_lock_time'];
-            $is_lock = $this->_redis->hMGet($key,'is_lock')['is_lock'] ?? 0;
+            $is_lock = $this->_redis->hMGet($key,['is_lock'])['is_lock'] ?? 0;
             if ($is_lock == 1){
                 throw new \Exception('',StatusConstants::ERROR_UPGRADE_AUTH_LOCK);
             }
@@ -256,15 +258,16 @@ class UserService extends ServiceBase
             ];
             $result = UserToken::where($where)->first();
             $token_data = [
-                'token' => \Common::gen_token(),
+                'token' => \Common::gen_token($user_info->id),
                 'status' => UserConstants::COMMON_STATUS_NORMAL,
+                'type' => $type,
             ];
             if ($result){
-                UserToken::where($where)->updated($token_data);
+                UserToken::where($where)->update($token_data);
             }else{
+                $token_data['user_id'] = $user_info->id;
                 UserToken::where($where)->insert($token_data);
             }
-            $user_manager = new UserManager();
             $token_key = $user_manager->get_token_key($result->token);
             // 查询旧token是否存在,并删除 创建新token保存
             if ($this->_redis->exists($token_key)){
@@ -272,9 +275,10 @@ class UserService extends ServiceBase
             }
             $data = [
                 'id' => $user_info->id,
-                'type' => $type,
+                'type' => $my_config['system_type'][$type],
             ];
-            $this->_redis->hmset($token_key,$data);  // 设置token信息
+            $new_token_key = $user_manager->get_token_key($token_data['token']);
+            $this->_redis->hmset($new_token_key,$data);  // 设置token信息
             // 登录成功操作处理
             $this->user_login_limit($expire_time,$account,UserConstants::USER_LOGIN_LIMIT_TYPE_SUCCESS);
         }catch (\Exception $e){
@@ -293,8 +297,9 @@ class UserService extends ServiceBase
      */
     public function user_login_limit($expire_time, $account, $type)
     {
+        $user_manager = new UserManager();
         //检测redis是否存在对应的键值，不存在存默认1，存在自增
-        $key = $this->get_last_key(UserConstants::HASH_USER_LOGIN_LIMIT,$account);
+        $key = $user_manager->get_last_key(UserConstants::HASH_USER_LOGIN_LIMIT,$account);
         $data = [];
         if ($type == 1) {
             $result = $this->_redis->hIncrBy($key, 'num', 1);
