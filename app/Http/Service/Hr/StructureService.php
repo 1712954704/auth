@@ -81,7 +81,6 @@ class StructureService extends ServiceBase
             }
             $where['id'] = $ids;
             $data = ['status'=>$status];
-
             $res = Structure::whereIn('id',$ids)->get();
             $normal_arr = $error_arr = [];
             // 获取状态正常的删除 status=1
@@ -92,9 +91,11 @@ class StructureService extends ServiceBase
                     $error_arr[] = $item->id;
                 }
             }
-            $result = Structure::where($where)->whereIn('id',$normal_arr)->update($data);
-            if (!$result){
-                throw new \Exception('',StatusConstants::ERROR_DATABASE);
+            if ($normal_arr){
+                $result = Structure::where($where)->whereIn('id',$normal_arr)->update($data);
+                if (!$result){
+                    throw new \Exception('',StatusConstants::ERROR_DATABASE);
+                }
             }
             if ($error_arr){
                 $this->return_data['data']['error_arr'] = $error_arr;
