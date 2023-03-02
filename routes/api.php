@@ -23,7 +23,8 @@ use \App\Http\Controllers\Common\UserController;
 
 
 Route::controller(UserController::class)->group(function () {
-    Route::get('/login', 'login');   // 登录
+    Route::post('/user/login', 'login');   // 登录
+    Route::get('/user/info', 'login');   // 登录
 });
 
 Route::controller(AuthController::class)->group(function () {

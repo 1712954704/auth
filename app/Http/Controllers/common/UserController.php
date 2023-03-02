@@ -50,13 +50,13 @@ class UserController extends BaseController
     /**
      * 获取用户信息包含权限个及个人配置等(登录后获取)
      */
-    public function get_user_info()
+    public function user_info()
     {
         $user_service = new UserService();
         switch ($this->method) {
             case 'GET': // 添加路由配置
                 // 检测参数
-                $data = $user_service->get_user_info($this->token,$this->system_type);
+                $data = $user_service->user_info($this->token,$this->system_type);
                 break;
             default:
                 return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL, 'Invalid Method');

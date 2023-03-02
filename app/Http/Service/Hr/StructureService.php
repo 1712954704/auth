@@ -35,7 +35,7 @@ class StructureService extends ServiceBase
         $where = [];
         $where['status'] = ModelConstants::COMMON_STATUS_NORMAL;
         if ($name){
-            $where['name'] = $name;
+            $where[] = ['name','like','%' .$name .'%'];
         }
         if ($id){
             $where['id'] = $id;
@@ -56,7 +56,6 @@ class StructureService extends ServiceBase
             // 查询地区id单一路径
             foreach ($area_ids as &$v){
                 $region_way_arr[$v] = $this->get_region_way($v);
-//                $v = $this->get_region_way($v);
             }
             foreach ($this->return_data['data']['list'] as &$item){
                 $item['area_name'] = $region_arr[$item['area_id']];
