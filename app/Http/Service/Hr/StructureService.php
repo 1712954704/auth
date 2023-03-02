@@ -69,22 +69,36 @@ class StructureService extends ServiceBase
 
     /**
      * 更新组织状态
-     * @param array $id 主键id
+     * @param array $ids 主键id
      * @param int $status 默认为 -1=已删除
      * @return array
      */
-    public function change_status($id,$status = ModelConstants::COMMON_STATUS_DELETE)
+    public function change_status($ids,$status = ModelConstants::COMMON_STATUS_DELETE)
     {
-        $where['id'] = $id;
-        $data = ['status'=>$status];
         try {
-            $res = Structure::find($id);
-            if ($res){
-                throw new \Exception('',StatusConstants::ERROR_DATABASE_REPEAT_DELETE);
+            if (!is_array($ids)){
+                throw new \Exception('',StatusConstants::ERROR_INVALID_PARAMS);
             }
-            $result = Structure::where($where)->update($data);
+            $where['id'] = $ids;
+            $data = ['status'=>$status];
+
+            $res = Structure::whereIn('id',$ids)->get();
+            $normal_arr = $error_arr = [];
+            // 获取状态正常的删除 status=1
+            foreach ($res as $item){
+                if ($item->status == ModelConstants::COMMON_STATUS_NORMAL){
+                    $normal_arr[] = $item->id;
+                }else{
+                    $error_arr[] = $item->id;
+                }
+            }
+            $result = Structure::where($where)->whereIn('id',$normal_arr)->update($data);
             if (!$result){
                 throw new \Exception('',StatusConstants::ERROR_DATABASE);
+            }
+            if ($error_arr){
+                $this->return_data['data']['error_arr'] = $error_arr;
+                $this->return_data['code'] = StatusConstants::ERROR_DATABASE_REPEAT_DELETE;
             }
         }catch (\Exception $e){
             $code = $e->getCode();
