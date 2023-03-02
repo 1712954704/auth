@@ -4,7 +4,7 @@
  * Date: 2023/03/1
  * Email: <1712954704@qq.com>
  */
-namespace App\Models\Hr;
+namespace App\Models\Common;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -13,7 +13,6 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Structure extends Authenticatable
 {
-//    use HasFactory;
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
@@ -21,7 +20,7 @@ class Structure extends Authenticatable
      *
      * @var string
      */
-    protected $connection = 'mysql_hr';
+    protected $connection = 'mysql_common';
 
     /**
      * 与模型关联的数据表.
