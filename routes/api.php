@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use \App\Http\Controllers\Hr\AuthController;
 use \App\Http\Controllers\Hr\RoleController;
+use \App\Http\Controllers\Common\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +21,10 @@ use \App\Http\Controllers\Hr\RoleController;
 //    return $request->user();
 //});
 
+
+Route::controller(UserController::class)->group(function () {
+    Route::get('/login', 'login');   // 登录
+});
 
 Route::controller(AuthController::class)->group(function () {
     Route::get('/auth/rule', 'rule_operate');   // 获取路由列表
