@@ -49,12 +49,18 @@ class StructureService extends ServiceBase
                 throw new \Exception('',StatusConstants::ERROR_DATABASE);
             }
             $this->return_data['data']['list'] = \Common::laravel_to_array($result);
-
-            $area_ids = array_column($this->return_data['data'],'area_id');
+            $area_ids = array_column($this->return_data['data']['list'],'area_id');
             $region = \Common::laravel_to_array(Region::whereIn('id',$area_ids)->get());
             $region_arr = array_column($region,'title','id');
+            $region_way_arr = [];
+            // 查询地区id单一路径
+            foreach ($area_ids as &$v){
+                $region_way_arr[$v] = $this->get_region_way($v);
+//                $v = $this->get_region_way($v);
+            }
             foreach ($this->return_data['data']['list'] as &$item){
                 $item['area_name'] = $region_arr[$item['area_id']];
+                $item['area_id'] = $region_way_arr[$item['area_id']];
             }
         }catch (\Exception $e){
             $code = $e->getCode();
@@ -68,6 +74,27 @@ class StructureService extends ServiceBase
     }
 
     /**
+     * 获取地区id单一路径信息
+     * @param array | int $id 主键id
+     * @param int $pid
+     * @return array
+     */
+    public function get_region_way($id,$pid = 1)
+    {
+        if (!$id){
+            return [];
+        }
+        static $way_arr = [];
+        $res = Region::select(['id','pid'])->find($id);
+        if ($res->pid != $pid){
+            $this->get_region_way($res->pid);
+        }
+        $way_arr[] = $res->id;
+        return $way_arr;
+    }
+
+
+    /**
      * 更新组织状态
      * @param array $ids 主键id
      * @param int $status 默认为 -1=已删除
@@ -79,7 +106,6 @@ class StructureService extends ServiceBase
             if (!is_array($ids)){
                 throw new \Exception('',StatusConstants::ERROR_INVALID_PARAMS);
             }
-            $where['id'] = $ids;
             $data = ['status'=>$status];
             $res = Structure::whereIn('id',$ids)->get();
             $normal_arr = $error_arr = [];
@@ -92,7 +118,7 @@ class StructureService extends ServiceBase
                 }
             }
             if ($normal_arr){
-                $result = Structure::where($where)->whereIn('id',$normal_arr)->update($data);
+                $result = Structure::whereIn('id',$normal_arr)->update($data);
                 if (!$result){
                     throw new \Exception('',StatusConstants::ERROR_DATABASE);
                 }
