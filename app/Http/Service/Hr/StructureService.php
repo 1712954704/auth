@@ -24,9 +24,10 @@ class StructureService extends ServiceBase
      * @param array $params [
      *      name => xxx   // 待搜索的值
      * ]
+     * @param int $id
      * @return array
      */
-    public function get_list($params)
+    public function get_list($params,$id)
     {
         $name = $params['name'] ?? '';
         $limit = $params['limit'] ?? 0;
@@ -36,6 +37,10 @@ class StructureService extends ServiceBase
         if ($name){
             $where['name'] = $name;
         }
+        if ($id){
+            $where['id'] = $id;
+        }
+
         try {
             $need_fields = ['id','name', 'number','code','type','area_id','build_time','faxes','address','order','remark','short_name','phone','home_page'];
             $result = Structure::where($where)->offset($limit)->limit($offset)->select($need_fields)->get();
