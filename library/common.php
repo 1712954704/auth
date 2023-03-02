@@ -197,6 +197,15 @@ class Common{
         }
         exit;
     }
+    static public function getController(){
+        $str = request()->route()->getActionName();
+        $num = strripos($str,"\\") + 1;
+        $str2 = substr($str,$num);
+        $num2 = strpos($str2,'@');
+        $controller = substr($str2,0,$num2 - 10);
+        return $controller;
+    }
+
 
     //生成唯一id
     static public function guid(){
@@ -1712,16 +1721,14 @@ class Common{
      * @time 2019-06-03 10:55
      * @return |null
      */
-    public static function getContentType(){
-        if (isset($_SERVER['CONTENT_TYPE'])) {
-            return $_SERVER['CONTENT_TYPE'];
-        }
-        if (isset($_SERVER['HTTP_CONTENT_TYPE'])) {
+    public static function getControllerName(){
+        $action = \Route::current()->getActionName();
+        list($class, $method) = explode('@', $action);
+        $class = substr(strrchr($class,'\\'),1);
+        $class = substr($class,0,10);
 
-            return $_SERVER['HTTP_CONTENT_TYPE'];
-        }
-
-        return null;
+        return $class;
+        return ['controller' => $class, 'method' => $method];
     }
 
     /**
