@@ -44,15 +44,16 @@ class StructureService extends ServiceBase
         try {
             $need_fields = ['id','name', 'number','code','type','area_id','build_time','faxes','address','order','remark','short_name','phone','home_page'];
             $result = Structure::where($where)->offset($limit)->limit($offset)->select($need_fields)->get();
+            $this->return_data['data']['count'] = Structure::where($where)->count();
             if (!$result){
                 throw new \Exception('',StatusConstants::ERROR_DATABASE);
             }
-            $this->return_data['data'] = \Common::laravel_to_array($result);
+            $this->return_data['data']['list'] = \Common::laravel_to_array($result);
 
             $area_ids = array_column($this->return_data['data'],'area_id');
             $region = \Common::laravel_to_array(Region::whereIn('id',$area_ids)->get());
             $region_arr = array_column($region,'title','id');
-            foreach ($this->return_data['data'] as &$item){
+            foreach ($this->return_data['data']['list'] as &$item){
                 $item['area_name'] = $region_arr[$item['area_id']];
             }
         }catch (\Exception $e){
