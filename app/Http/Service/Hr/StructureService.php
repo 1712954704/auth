@@ -8,7 +8,7 @@ namespace App\Http\Service\Hr;
 
 use App\Http\Service\ServiceBase;
 use App\Models\Common\Region;
-use App\Models\Hr\Structure;
+use App\Models\Common\Structure;
 use library\Constants\Model\ModelConstants;
 use library\Constants\StatusConstants;
 
