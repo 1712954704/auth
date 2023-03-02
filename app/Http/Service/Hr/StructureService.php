@@ -37,7 +37,7 @@ class StructureService extends ServiceBase
             $where['name'] = $name;
         }
         try {
-            $need_fields = ['id','name', 'number','code','type','area_id','build_time'];
+            $need_fields = ['id','name', 'number','code','type','area_id','build_time','faxes','address','order','remark','short_name','phone','home_page'];
             $result = Structure::where($where)->offset($limit)->limit($offset)->select($need_fields)->get();
             if (!$result){
                 throw new \Exception('',StatusConstants::ERROR_DATABASE);
