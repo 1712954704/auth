@@ -318,6 +318,7 @@ class UserService extends ServiceBase
                 'user_id' => $user_info->id,
             ];
             $result = UserToken::where($where)->first();
+            $result = \Common::laravel_to_array($result);
             $token_data = [
                 'token' => \Common::gen_token($user_info->id),
                 'status' => UserConstants::COMMON_STATUS_NORMAL,
@@ -329,10 +330,13 @@ class UserService extends ServiceBase
                 $token_data['user_id'] = $user_info->id;
                 UserToken::where($where)->insert($token_data);
             }
-            $token_key = $user_manager->get_token_key($result->token);
-            // 查询旧token是否存在,并删除 创建新token保存
-            if ($this->_redis->exists($token_key)){
-                $this->_redis->del($token_key);
+            // 第一次登录无token
+            if ($result && isset($result['token'])){
+                $token_key = $user_manager->get_token_key($result->token);
+                // 查询旧token是否存在,并删除 创建新token保存
+                if ($this->_redis->exists($token_key)){
+                    $this->_redis->del($token_key);
+                }
             }
             $data = [
                 'id' => $user_info->id,
