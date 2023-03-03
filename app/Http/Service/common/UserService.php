@@ -11,6 +11,8 @@ use App\Models\common\User;
 use App\Models\common\UserInfo;
 use App\Models\common\UserToken;
 use App\Http\Service\ServiceBase;
+use App\Models\Hr\UserRole;
+use Illuminate\Support\Facades\DB;
 use library\Constants\Model\UserConstants;
 use library\Constants\StatusConstants;
 
@@ -348,13 +350,6 @@ class UserService extends ServiceBase
     */
     public function lock_user($user_info)
     {
-//        $user_manager = new UserManager();
-//        $account = $user_info['account'];
-//        $expire_time = \Common::get_config('user_safe')['login_fail_lock_time'];
-//        $key = $user_manager->get_last_key(UserConstants::HASH_USER_LOGIN_LIMIT,$account);
-//        $this->_redis->hMSet($key, ['is_lock' => 1]);
-//        //有效期12小时3600*12
-//        $this->_redis->expire($key, $expire_time);
         // 用户锁定操作 todo 后续需要修改为mq异步操作
         User::where('id',$user_info['id'])->update(['status'=>UserConstants::COMMON_STATUS_LOCK]);
     }
@@ -408,10 +403,8 @@ class UserService extends ServiceBase
         $auth_result = $this->get_user_auth_info_by_id($user_id,[$my_config[$system_type]]);
         // 获取用户信息缓存
         $user_info = $this->get_user_info_by_id($user_id);
-
         // 合并用户信息数组
         $info = array_merge($auth_result,$user_info);
-
         return [];
     }
 
@@ -419,13 +412,80 @@ class UserService extends ServiceBase
     /**
      * 注册
      * @author jack
-     * @dateTime 2023-03-02 11:32
+     * @dateTime 2023-03-03 12:55
      * @param array $params
      * @return mixed
      */
     public function register($params)
     {
-
+        try {
+            // 开启事务
+            DB::beginTransaction();
+            // 加密用户密码
+            $my_config = \Common::get_config();
+            $salt = \Common::get_random_str(4);
+            // 主表信息
+            $user = [
+                'account' => $params['account'],
+                'name' => $params['name'],
+                'gender' => $params['gender'],
+                'job_number' => $params['job_number'],
+                'email' => $params['email'],
+                'structure_id' => $params['structure_id'],
+                'department_id' => $params['department_id'],
+                'manager_id' => $params['manager_id'],
+                'position_id' => $params['position_id'],
+                'job_type' => $params['job_type'],
+                'status' => $params['status'],
+                'phone' => $params['phone'],
+                'landline_phone' => $params['landline_phone'],
+                'avatar' => $params['avatar'],
+                'uuid' => \Common::guid(),
+                'salt' => $salt,
+                'pwd' => sha1($salt.sha1($my_config['user_safe']['default_password'])), // 初始密码为默认设置
+            ];
+            $create_user_result = User::create($user);
+            // 副表信息
+            $user_info = [
+                'user_id' => $create_user_result->id,
+                'nation_id' => $params['nation_id'],
+                'native_place' => $params['native_place'],
+                'entry_date' => $params['entry_date'],
+                'become_data' => $params['become_data'],
+                'id_number' => $params['id_number'],
+                'birth_date' => $params['birth_date'],
+                'education' => $params['education'],
+                'address' => $params['address'],
+                'emergency_contact_name' => $params['emergency_contact_name'],
+                'emergency_contact_relation' => $params['emergency_contact_relation'],
+                'emergency_contact_phone' => $params['emergency_contact_phone'],
+                'emergency_contact_address' => $params['emergency_contact_address'],
+                'remark' => $params['remark'],
+            ];
+            $create_user_info_result = UserInfo::create($user_info);
+            // 用户角色关系 创建关联关系
+            $role_id = $params['role_id'];
+            if ($role_id && is_array($role_id)){
+                $user_role_insert_arr = [];
+                foreach ($role_id as $item){
+                    $user_role_insert_arr[] = [
+                        'user_id' => $create_user_result->id,
+                        'role_id' => $item,
+                    ];
+                }
+                UserRole::insert($user_role_insert_arr);
+            }
+            DB::commit();
+        }catch (\Exception $e){
+            DB::rollBack();
+            $code = $e->getCode();
+            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+                $this->return_data['code'] = $code;
+            }else{
+                $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
+            }
+        }
+        return $this->return_data;
     }
 
 
