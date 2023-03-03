@@ -39,8 +39,7 @@ class UserController extends BaseController
                 // 检测参数
                 $account = $this->check_param('account');  // 账号
                 $pwd = $this->check_param('pwd');  // 密码
-                $type = $this->check_param('type');  // 登录系统类型
-                $data = $user_service->login($account, $pwd, $type);
+                $data = $user_service->login($account, $pwd, $this->system_type);
                 break;
             default:
                 return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL, 'Invalid Method');
@@ -95,18 +94,29 @@ class UserController extends BaseController
                 // 检测参数
                 $params['account'] = $this->check_param('account');  // 账号
                 $params['name'] = $this->check_param('name');  // 姓名
+                $params['gender'] = $this->check_param('gender');  // 性别
                 $params['job_number'] = $this->check_param('job_number');  // 员工工号
                 $params['email'] = $this->check_param('email');  // 邮箱
-                $params['gender'] = $this->check_param('gender');  // 性别
                 $params['structure_id'] = $this->check_param('structure_id');  // 所属组织
                 $params['department_id'] = $this->check_param('department_id');  // 所属部门
-                $params['manager_id'] = $this->check_param('manager_id');  // 所属主管
-                $params['position_id'] = $this->data_arr['position_id'];  // 所属岗位
-                $params['role_id'] = $this->data_arr['role_id'];  // 所属角色 数组形式 可以有多个角色
-                $params['position_id'] = $this->data_arr['position_id'];  // 所属岗位
-                $params['job_type'] = $this->data_arr['job_type'];  // 用户类型 1=在职 2=离职
-                $params['status'] = $this->data_arr['status'];  // 状态 1=在职 2=离职
-                $params['position_id'] = $this->data_arr['position_id'];  // 所属岗位
+                $params['manager_id'] = $this->check_param('manager_id');  // 直属主管
+                $params['position_id'] = $this->data_arr['position_id'] ?? null;  // 所属岗位
+                $params['role_id'] = $this->data_arr['role_id'] ?? [];  // 所属角色 数组形式 可以有多个角色
+                $params['position_id'] = $this->data_arr['position_id'] ?? [];  // 所属岗位
+                $params['job_type'] = $this->data_arr['job_type'] ?? null;  // 用户类型 1=在职 2=离职
+                $params['status'] = $this->data_arr['status'] ?? '';  // 状态 1=在职 2=离职
+                $params['avatar'] = $this->data_arr['avatar'] ?? '';  // 头像
+                $params['nation_id'] = $this->data_arr['nation_id'] ?? null;  // 民族
+                $params['native_place'] = $this->data_arr['native_place'] ?? '';  // 籍贯
+                $params['entry_date'] = $this->data_arr['entry_date'] ?? null;  // 正式入职时间
+                $params['become_data'] = $this->data_arr['become_data'] ?? null;  // 转正时间
+                $params['id_number'] = $this->data_arr['id_number'] ?? '';  // 身份证号
+                $params['mobile_phone'] = $this->data_arr['mobile_phone'] ?? '';  // 手机
+                $params['phone'] = $this->data_arr['phone'] ?? '';  // 电话
+                $params['become_data'] = $this->data_arr['become_data'];  // 转正时间
+                $params['become_data'] = $this->data_arr['become_data'];  // 转正时间
+                $params['become_data'] = $this->data_arr['become_data'];  // 转正时间
+                $params['become_data'] = $this->data_arr['become_data'];  // 转正时间
 
 
 
