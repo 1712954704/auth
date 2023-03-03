@@ -54,8 +54,12 @@ class UserController extends BaseController
     {
         $user_service = new UserService();
         switch ($this->method) {
-            case 'GET': // 添加路由配置
-                $data = $user_service->user_info($this->token,$this->system_type);
+            case 'GET': // 获取用户信息
+                $data['data']['info'] = $this->user_info;
+                $routes = $user_service->user_route_info($this->user_info['id'],$this->system_type);
+                $data['code'] = $routes['code'];
+                $data['msg'] = $routes['msg'];
+                $data['data']['routes'] = $routes['data'];
                 break;
             default:
                 return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL, 'Invalid Method');

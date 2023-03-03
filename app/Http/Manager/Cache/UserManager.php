@@ -30,9 +30,23 @@ class UserManager extends ManagerBase
      */
     public function get_user_auth_cache_key($user_id)
     {
-        $user_id = UserConstants::HASH_USER_AUTH_INFO_PREFIX . $user_id;
+        $user_id = UserConstants::HASH_USER_AUTH_PREFIX . $user_id;
         return $user_id;
     }
+
+    /**
+     * 获取用户路由表缓存key
+     *
+     * @param $user_id
+     *
+     * @return string
+     */
+    public function get_user_route_cache_key($user_id)
+    {
+        $user_id = UserConstants::HASH_USER_ROUTE_PREFIX . $user_id;
+        return $user_id;
+    }
+
 
     /**
      * 生成token key
