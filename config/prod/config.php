@@ -33,6 +33,8 @@ return [
         'login_fail_lock_time'=>CacheConstants::CACHE_EXPIRE_TIME_TWELVE_HOURS,//登录失败账号锁定12小时
     ],
 
+    // 上传相关
     'img_domain_url'=>'https://www.bio-cloud.com.cn/img/', // 图片域名地址
+    'img_file' => dirname(__FILE__) . '/../../file/img/', // 用于后台上传图片确定存储位置
 
 ];

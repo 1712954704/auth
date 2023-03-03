@@ -95,9 +95,17 @@ class UserService extends ServiceBase
         if (!$data && !$this->_redis->exists($redis_key)){  // 用户缓存信息查不到则生成
             $user_info = $this->_inner_get_user_info_for_cache($user_id);
             if ($user_info){
+                // 数组转json存储
+                foreach($user_info as &$item){
+                    $item = json_encode($item);
+                }
                 $this->_redis->hMset($redis_key, $user_info);
                 $data = $this->_redis->hgetall($redis_key);  // 获取全部信息
             }
+        }
+        // 解码
+        foreach ($data as &$value){
+            $value = json_decode($value,true);
         }
         $return_data['data'] = $data;
         return $return_data;
@@ -132,12 +140,10 @@ class UserService extends ServiceBase
                 $data = $this->_redis->hgetall($redis_key);  // 获取全部信息
             }
         }
-
         // 解码
         foreach ($data as &$value){
             $value = json_decode($value,true);
         }
-
         return $data;
     }
 
@@ -154,25 +160,13 @@ class UserService extends ServiceBase
     {
         $user_model = new User();
         $user = $user_model->get_user_by_id($user_id,UserConstants::COMMON_STATUS_NORMAL);
-
-        if (empty($user)) {
-            return array();
-        }
-
+        $user = \Common::laravel_to_array($user);
         // 查询副表用户信息
         $user_info_model = new UserInfo();
-
         $user_info = $user_info_model->get_user_info($user_id);
-        if (empty($user_info)){
-            return array();
-        }
-
-        $user = \Common::laravel_to_array($user);
         $user_info = \Common::laravel_to_array($user_info);
-        // 合并用户信息数组
-        $user_info = array_merge($user,$user_info);
-
-        return $user_info;
+        // 合并用户信息数组并返回
+        return array_merge($user,$user_info);
     }
 
     /**

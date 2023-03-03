@@ -54,7 +54,7 @@ class UserInfo extends Authenticatable
     public function get_user_info($user_id,$field = "*")
     {
         $where['user_id']= $user_id;
-        return $this->select($field)->where($where)->get();
+        return $this->select($field)->where($where)->first();
     }
 
 }
