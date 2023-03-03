@@ -55,11 +55,10 @@ class User extends Authenticatable
     public function get_user_by_id($user_id,$status = null,$field = "*")
     {
         $where['id']= $user_id;
-
         if($status !== null){
             $where['status']= $status;
         }
-        return $this->select($field)->where($where)->get();
+        return $this->select($field)->where($where)->first();
     }
 
 }

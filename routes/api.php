@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use \App\Http\Controllers\Hr\AuthController;
 use \App\Http\Controllers\Hr\RoleController;
 use \App\Http\Controllers\Common\UserController;
+use \App\Http\Controllers\Hr\StructureController;
+use \App\Http\Controllers\common\FileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,7 +47,7 @@ Route::controller(RoleController::class)->group(function () {
 });
 
 
-Route::controller(\App\Http\Controllers\Hr\StructureController::class)->group(function () {
+Route::controller(StructureController::class)->group(function () {
     Route::get('/structure', 'structure_operate');   // 获取组织架构列表
     Route::post('/structure', 'structure_operate');   // 添加组织
     Route::put('/structure', 'structure_operate');   // 更新组织
@@ -54,6 +56,9 @@ Route::controller(\App\Http\Controllers\Hr\StructureController::class)->group(fu
     Route::get('/structure/group', 'get_group_list');   // 获取上级单位信息
 });
 
+Route::controller(FileController::class)->group(function () {
+    Route::post('/file/add_file', 'add_file');   // 文件上传
+});
 
 Route::apiResource('department',\App\Http\Controllers\common\DepartmentController::class);
 Route::apiResource("hr/check",\App\Http\Controllers\Hr\CheckController::class);
