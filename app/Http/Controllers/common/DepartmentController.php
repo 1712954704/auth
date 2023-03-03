@@ -34,13 +34,16 @@ class DepartmentController extends BaseController
         $pid = request('pid') ;
         $structure_id = request('structure_id') ;
         $id = request('id') ;
+        $group_type= request('group_type') ;
 
 
         $result = $model::where('structure_id',  $structure_id )
             ->where('id',  $id )
             ->where('pid',  $pid )
-            ->select('id','name','structure_id','pid','encode','order')
-            ->with(['children:id,name,structure_id,pid,encode,order'])
+            ->where('group_type',  $group_type )
+            ->select('id','name','structure_id','pid','encode','order','created_at','updated_at','leader')
+            ->with(['children:id,name,structure_id,pid,encode,order,created_at,updated_at,leader'])
+            ->with(['leader:account'])
             ->orderBy('order', 'desc')
             ->paginate($perPage, $columns, $pageName, $current_page);;
 
@@ -66,30 +69,55 @@ class DepartmentController extends BaseController
     public function store(Request $request)
     {
 
-        $model = "App\Models\Hr\\"."Position";
 
-        $pid = $request->input('pid');
-        $name = $request->input('name');
-        $rules = $request->input('rules');
 
-        if (!$name){
-            return \Common::format_return_result(404,'缺少参数','400');
+
+        try {
+
+            // 验证...
+            $model =  "App\Models\common\\".\common::getControllerName();
+
+            $pid = $request->input('pid')?$request->input('pid'):0;
+            $name = $request->input('name');
+            $order = $request->input('order');
+            $encode = $request->input('encode');
+            $structure_id = $request->input('structure_id');
+            $group_type = $request->input('group_type');
+            $leader = $request->input('leader');
+
+            if (!$name or !$group_type){
+                return \Common::format_return_result(404,'缺少参数','400');
+            }
+
+
+
+
+
+            //增加
+            $result = $model::create([
+                'name' => $name,
+                'pid' => $pid,
+                'encode' => $encode,
+                'order' => $order,
+                'structure_id' => $structure_id,
+                'group_type' => $group_type,
+                'leader' => $leader,
+            ]);
+
+            $response['code'] = 200;
+            $response['msg']  = 'success';
+            $response['data'] = $result ;
+
+            return \Common::format_return_result($response['code'],$response['msg'],$response['data']);
+
+        } catch (\Throwable $e) {
+            \dump($e);
+            return \Common::format_return_result($e->getCode(),$e->getMessage(),[]);
         }
 
-        //增加
-        $result = $model::create([
-            'pid' => $pid,
-            'name' =>$name,
-            'rules' =>$rules,
-        ]);
 
 
 
-        $response['code'] = 200;
-        $response['msg']  = 'success';
-        $response['data'] = $result ;
-
-        return \Common::format_return_result($response['code'],$response['msg'],$response['data']);
 
     }
 
@@ -104,7 +132,7 @@ class DepartmentController extends BaseController
         $model =  "App\Models\common\\".\common::getControllerName();
 
         $result = $model::where('id', '=', $id)
-            ->select('id','name','structure_id','pid','encode','order')
+            ->select('id','name','structure_id','pid','encode','order','group_type','leader')
             ->first();
 
         $array=explode(",",$result->rules);
@@ -139,6 +167,8 @@ class DepartmentController extends BaseController
             $status = $request->input('status');
             $order = $request->input('order');
             $encode = $request->input('encode');
+            $structure_id = $request->input('structure_id');
+            $leader = $request->input('leader');
 
 
             $result = $model::where('id', $id)
@@ -148,6 +178,8 @@ class DepartmentController extends BaseController
                     'pid' => $pid,
                     'encode' => $encode,
                     'order' => $order,
+                    'structure_id' => $structure_id,
+                    'leader' => $leader,
                 ]);
 
             $response['code'] = $result > 0  ?'200':'404';
