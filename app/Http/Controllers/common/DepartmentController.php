@@ -21,16 +21,10 @@ class DepartmentController extends BaseController
      */
     public function index()
     {
-        $model = "App\Models\Hr\\"."Position";
+
         $model =  \common::getControllerName();
         $model =  "App\Models\common\\".\common::getControllerName();
 
-        // dump($model);
-
-
-
-        // 简单分页
-        // $result = DB::connection('mysql_hr')->table('positions')->Paginate(15);
 
         $columns = ['*'];
         $pageName = 'bio';
@@ -47,23 +41,6 @@ class DepartmentController extends BaseController
         return \Common::format_return_result($response['code'],$response['msg'],$response['data']);
 
 
-        // try{
-        //     // throw new \Exception('626',26);
-        //
-        //     echo "index";
-        //
-        // }
-        //
-        // catch (\Exception $e) {
-        //
-        // echo $e->getCode();
-        // report($e);
-        //
-        //
-        //
-        // return false;
-        // }
-
 
 
 
@@ -77,10 +54,6 @@ class DepartmentController extends BaseController
      */
     public function store(Request $request)
     {
-
-        // $request->validate([
-        //     'name' => 'required|unique:posts|max:255',
-        // ]);
 
         $model = "App\Models\Hr\\"."Position";
 
@@ -101,8 +74,6 @@ class DepartmentController extends BaseController
 
 
 
-
-
         $response['code'] = 200;
         $response['msg']  = 'success';
         $response['data'] = $result ;
@@ -119,18 +90,6 @@ class DepartmentController extends BaseController
      */
     public function show($id)
     {
-        // return \common::getControllerName();
-
-
-
-        // 生成唯一ID
-        // \Common::guid();
-        // 异常表示调用
-        // return  StatusConstants::ERROR_DATABASE;
-
-        // 检索，如果重复，会抛 `MultipleRecordsFoundException` 异常，并断言重复的条数...
-        // $result  =  Position::where(['id'  =>  $id])->sole();
-        // return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL,'Invalid Method');
 
         $result = DB::connection('mysql_hr')->table('positions')
             ->where('id', '=', $id)
@@ -146,7 +105,6 @@ class DepartmentController extends BaseController
         $response['data'] = $result ;
 
         return \Common::format_return_result($response['code'],$response['msg'],$response['data']);
-        // return json_encode($response);
     }
 
     /**
@@ -158,12 +116,9 @@ class DepartmentController extends BaseController
      */
     public function update(Request $request, $id)
     {
-        //
 
         try {
             // 验证...
-
-            // throw new \Exception('',StatusConstants::ERROR_DATABASE);
 
             $pid = $request->input('pid');
             $name = $request->input('name');
@@ -193,7 +148,6 @@ class DepartmentController extends BaseController
             report($e);
 
 
-
             return false;
         }
 
@@ -214,11 +168,6 @@ class DepartmentController extends BaseController
 
         $result = Position::where('id', $id)->delete();
 
-        // DB删除方法
-        // $result = DB::connection('mysql_hr')->table('positions')
-        //     ->where('id', $id)
-        //     ->update(['status' => 2]);
-        //     ->update(['deleted_at' => time(),'updated_at'=>time()]);
 
         $response['code'] = $result > 0  ?'200':'404';
         $response['msg']  = $result > 0  ?'success':'数据不存在';
