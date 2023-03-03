@@ -72,6 +72,7 @@ class StatusConstants
     // 数据冲突
     const ERROR_DATA_CONFLICT = 40900;
     const ERROR_DATA_CONFLICT_CHILD_EXIST = 40901;  // 数据下有子集不能删除
+    const ERROR_DATA_NUMERIC_VALUE_EXIST = 22003;  // 数据下有子集不能删除
 
 
     //版本过低
@@ -97,6 +98,7 @@ class StatusConstants
         self::ERROR_NOT_FOUND_USER_INFO                                    => 404,
         self::ERROR_DATA_CONFLICT                                          => 409,
         self::ERROR_DATA_CONFLICT_CHILD_EXIST                              => 409,
+        self::ERROR_DATA_NUMERIC_VALUE_EXIST                               => 409,
         self::ERROR_DATABASE                                               => 500,
         self::ERROR                                                        => 500,
         self::ERROR_GENERATE_CACHE_FAILED                                  => 500,
@@ -164,6 +166,7 @@ class StatusConstants
         self::ERROR_INVALID_PARAMS => 'Invalid Param',
         self::ERROR_UNAUTHORIZED_TOKEN => 'Invalid Token',
         self::ERROR_ACCESS_WX_API_EXCEPTION => 'Wx Api Exception',
+        self::ERROR_DATA_NUMERIC_VALUE_EXIST => 'Numeric value out of range',
     ];
 
 }

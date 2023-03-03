@@ -8,6 +8,8 @@ use App\Models\common\Department;
 use App\Models\Hr\Position;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use library\Constants\StatusConstants;
+use Predis\Command\Redis\DUMP;
 
 class DepartmentController extends BaseController
 {
@@ -22,7 +24,6 @@ class DepartmentController extends BaseController
     public function index()
     {
 
-        $model =  \common::getControllerName();
         $model =  "App\Models\common\\".\common::getControllerName();
 
 
@@ -31,15 +32,16 @@ class DepartmentController extends BaseController
         $current_page = request('current_page') ? request('current_page') : 1;;
         $perPage = request('perPage') ? request('perPage') : 2;
         $pid = request('pid') ;
+        $structure_id = request('structure_id') ;
+        $id = request('id') ;
 
 
-        $result = $model::where('pid',  $pid )
-            ->select('id','name','pid','id')
-            // ->with(['user'])
-            // ->with(['pid'])
-            ->with(['children:id,name,pid,number'])
-            // ->with(['children:id,name'])
-
+        $result = $model::where('structure_id',  $structure_id )
+            ->where('id',  $id )
+            ->where('pid',  $pid )
+            ->select('id','name','structure_id','pid','encode','order')
+            ->with(['children:id,name,structure_id,pid,encode,order'])
+            ->orderBy('order', 'desc')
             ->paginate($perPage, $columns, $pageName, $current_page);;
 
 
@@ -99,10 +101,10 @@ class DepartmentController extends BaseController
      */
     public function show($id)
     {
+        $model =  "App\Models\common\\".\common::getControllerName();
 
-        $result = DB::connection('mysql_hr')->table('positions')
-            ->where('id', '=', $id)
-            ->where('deleted_at', '=', null)
+        $result = $model::where('id', '=', $id)
+            ->select('id','name','structure_id','pid','encode','order')
             ->first();
 
         $array=explode(",",$result->rules);
@@ -126,22 +128,26 @@ class DepartmentController extends BaseController
     public function update(Request $request, $id)
     {
 
+
+        $model =  "App\Models\common\\".\common::getControllerName();
+
         try {
             // 验证...
 
             $pid = $request->input('pid');
             $name = $request->input('name');
             $status = $request->input('status');
-            $rules = $request->input('rules');
+            $order = $request->input('order');
+            $encode = $request->input('encode');
 
 
-            $result = DB::connection('mysql_hr')->table('positions')
-                ->where('id', $id)
+            $result = $model::where('id', $id)
                 ->update([
                     'name' => $name,
                     'status' => $status,
                     'pid' => $pid,
-                    'rules' => $rules,
+                    'encode' => $encode,
+                    'order' => $order,
                 ]);
 
             $response['code'] = $result > 0  ?'200':'404';
@@ -153,11 +159,10 @@ class DepartmentController extends BaseController
 
         } catch (\Exception $e) {
 
-            echo $e->getCode();
-            report($e);
+            $response['code'] = StatusConstants::ERROR_DATA_NUMERIC_VALUE_EXIST;
+            return \Common::format_return_result($response['code'],'','');
 
-
-            return false;
+ ;
         }
 
 
@@ -174,9 +179,8 @@ class DepartmentController extends BaseController
      */
     public function destroy($id)
     {
-
-        $result = Position::where('id', $id)->delete();
-
+        $model =  "App\Models\common\\".\common::getControllerName();
+        $result = $model::where('id', $id)->delete();
 
         $response['code'] = $result > 0  ?'200':'404';
         $response['msg']  = $result > 0  ?'success':'数据不存在';
