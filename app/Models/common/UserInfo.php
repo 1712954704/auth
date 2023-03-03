@@ -45,6 +45,16 @@ class UserInfo extends Authenticatable
     public $timestamps = false;
 
     /**
+     * 可批量赋值的属性。
+     *
+     * @var array
+     */
+    protected $fillable = ['user_id','nation_id','native_place','entry_date','become_data','id_number','birth_date',
+        'education','address','emergency_contact_name','emergency_contact_relation','emergency_contact_phone','emergency_contact_address',
+        'remark'
+    ];
+
+    /**
      * 获取用户信息的查询
      * @date 2023/02/27
      * @param $user_id

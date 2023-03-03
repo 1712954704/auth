@@ -21,13 +21,15 @@ return [
     ],   // 系统类型对照表
     'no_login' => [
         'api/user/login',
-        'api/user/clear_user_lock'
+        'api/user/clear_user_lock',
+        'api/user/register'
     ],  // 免登录接口
 
     /** 业务配置 */
     'is_singapore'                       => 0,
     //用户安全
     'user_safe'=>[
+        'default_password'                    => 'password@123',  // 用户密码(默认值)
         'login_verify_num'                    => 3,  // 用户密码登录错误超过次数开启验证码
         'login_lock_num'                      => 6,  // 用户密码登录错误超过锁定次数
         'login_fail_lock_time'=>CacheConstants::CACHE_EXPIRE_TIME_TWELVE_HOURS,//登录失败账号锁定12小时
