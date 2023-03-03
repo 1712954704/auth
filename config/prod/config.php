@@ -17,12 +17,14 @@ return [
     'sms_ip_limit' => 100, // 针对ip获取验证码次数限制
     'sms_ip_limit_expire' => 86400, // 针对ip获取验证码次数限制key过期时间
     'system_type' => [
-        1 => 'hr'
+        1 => 'hr',
+        2 => 'hr3'
     ],   // 系统类型对照表
     'no_login' => [
         'api/user/login',
         'api/user/clear_user_lock',
-        'api/user/register'
+        'api/user/register',
+        'api/file/add_file'
     ],  // 免登录接口
 
     /** 业务配置 */

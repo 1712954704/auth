@@ -74,11 +74,11 @@ class UserService extends ServiceBase
 
     /**
      * 根据用户id获取用户信息
-     * @param string $token 用户token
-     * @param string $fields 字段名
+     * @param string $user_id 用户id
+     * @param array $fields 字段名
      * @return array
      */
-    public function get_user_info_by_id($user_id,$fields='')
+    public function get_user_info_by_id($user_id,$fields=[])
     {
         $return_data = [
             'code' => 200,
@@ -115,7 +115,7 @@ class UserService extends ServiceBase
 
     /**
      * 根据用户id获取用户权限信息
-     * @param string $token 用户token
+     * @param string $user_id 用户id
      * @param array $fields 字段名
      * @return array
      */
@@ -123,22 +123,21 @@ class UserService extends ServiceBase
     {
         $user_manager = new UserManager();
         $redis_key = $user_manager->get_user_auth_cache_key($user_id);
-
         // 使用token获取用户缓存信息
         if ($fields){
             $data = $this->_redis->hmget($redis_key,$fields);  // 获取全部信息
         }else{
             $data = $this->_redis->hgetall($redis_key);  // 获取全部信息
         }
-
-        if (!$data && !$this->_redis->exists($redis_key)){  // 用户缓存信息查不到则生成
-            $user_info = $this->_inner_get_user_info_for_cache($user_id);
-            if ($user_info){
+        if ( !$this->_redis->exists($redis_key) || !$data){  // 用户缓存信息查不到则生成
+            $user_auth_info = $this->_inner_get_user_auth_info_for_cache($user_id);
+            if ($user_auth_info){
+                $user_auth_info_new = array_column($user_auth_info,'name'); // 只获取单列
                 // 数组转json存储
-                foreach($user_info as &$item){
-                    $item = json_encode($item);
+                foreach($user_auth_info_new as &$item){
+                    $item = json_encode($item,JSON_UNESCAPED_UNICODE);
                 }
-                $this->_redis->hMset($redis_key, $user_info);
+                $this->_redis->hMset($redis_key, $user_auth_info_new);
                 $data = $this->_redis->hgetall($redis_key);  // 获取全部信息
             }
         }
@@ -148,6 +147,25 @@ class UserService extends ServiceBase
         }
         return $data;
     }
+
+    /**
+     * 更新用户路由表缓存信息
+     * @scope 内部使用
+     *
+     * @param int $user_id 用户id
+     *
+     * @return array
+     */
+    public function _inner_update_user_routes_for_cache($user_id)
+    {
+
+        $user_auth_info = $this->_inner_get_user_auth_info_for_cache($user_id);
+
+
+
+        return [];
+    }
+
 
 
     /**
@@ -169,6 +187,44 @@ class UserService extends ServiceBase
         $user_info = \Common::laravel_to_array($user_info);
         // 合并用户信息数组并返回
         return array_merge($user,$user_info);
+    }
+
+
+    /**
+     * 获取要存储到权限缓存里的用户信息数据
+     * @scope 内部使用
+     *
+     * @param int $user_id 用户id
+     * @param string $database_name 数据库连接
+     *
+     * @return array
+     */
+    public function _inner_get_user_auth_info_for_cache($user_id,$database_name='mysql_hr')
+    {
+        // 查询用户权限信息
+        $sql = "select a.name,is_menu,code,pid from hr_auth_rule a left join hr_role_auth_rule b on a.id = b.auth_rule_id
+        left join hr_user_role c on b.role_id=c.role_id where c.user_id = ".$user_id;
+        $result = DB::connection($database_name)->select($sql);
+        $return_data[NOW_SYSTEM_TYPE] = array_column(array_map('get_object_vars', $result),'name');
+        return $return_data;
+    }
+
+    /**
+     * 获取要存储到权限缓存里的用户信息数据
+     * @scope 内部使用
+     *
+     * @param int $user_id 用户id
+     * @param string $database_name 数据库连接
+     *
+     * @return array
+     */
+    public function _inner_get_user_auth_info_for_cache_new($user_id,$database_name='mysql_hr')
+    {
+        // 查询用户权限信息 todo 当出现多个角色时并且路由重复时会查询多条重复的路由 需要修改 暂时这样写
+        $sql = "select a.id,a.code,a.pid from hr_auth_rule a left join hr_role_auth_rule b on a.id = b.auth_rule_id
+        left join hr_user_role c on b.role_id=c.role_id where c.user_id = ".$user_id;
+        $result = DB::connection($database_name)->select($sql);
+        return array_map('get_object_vars', $result);
     }
 
     /**
@@ -262,6 +318,7 @@ class UserService extends ServiceBase
                 'user_id' => $user_info->id,
             ];
             $result = UserToken::where($where)->first();
+            $result = \Common::laravel_to_array($result);
             $token_data = [
                 'token' => \Common::gen_token($user_info->id),
                 'status' => UserConstants::COMMON_STATUS_NORMAL,
@@ -273,10 +330,13 @@ class UserService extends ServiceBase
                 $token_data['user_id'] = $user_info->id;
                 UserToken::where($where)->insert($token_data);
             }
-            $token_key = $user_manager->get_token_key($result->token);
-            // 查询旧token是否存在,并删除 创建新token保存
-            if ($this->_redis->exists($token_key)){
-                $this->_redis->del($token_key);
+            // 第一次登录无token
+            if ($result && isset($result['token'])){
+                $token_key = $user_manager->get_token_key($result->token);
+                // 查询旧token是否存在,并删除 创建新token保存
+                if ($this->_redis->exists($token_key)){
+                    $this->_redis->del($token_key);
+                }
             }
             $data = [
                 'id' => $user_info->id,
@@ -386,26 +446,79 @@ class UserService extends ServiceBase
 
 
     /**
-     * 获取用户信息包含权限个及个人配置等
+     * 获取用户路由表信息
      * @author jack
      * @dateTime 2023-03-02 13:21
      * @param string $token         用户token
      * @param string $system_type  系统类型
      * @return array
      */
-    public function user_info($token,$system_type)
+    public function user_route_info($user_id,$system_type)
     {
-        // 验证token是否存在
-        $token_result = $this->get_user_info_by_token($token);
-        $user_id = $token_result['data']['id'];
-        // 获取用户权限缓存信息
-        $my_config = \Common::get_config();
-        $auth_result = $this->get_user_auth_info_by_id($user_id,[$my_config[$system_type]]);
-        // 获取用户信息缓存
-        $user_info = $this->get_user_info_by_id($user_id);
-        // 合并用户信息数组
-        $info = array_merge($auth_result,$user_info);
-        return [];
+        try {
+            // 获取用户权限缓存信息
+            $my_config = \Common::get_config();
+            $type = $my_config['system_type'][$system_type];
+            $user_manager = new UserManager();
+            $redis_key = $user_manager->get_user_route_cache_key($user_id);
+            // 获取对应系统的路由表
+            $fields = [$my_config['system_type'][$system_type]];
+            // 使用token获取用户缓存信息
+            if ($fields){
+                $data = $this->_redis->hmget($redis_key,$fields);  // 获取全部信息
+            }else{
+                $data = $this->_redis->hgetall($redis_key);  // 获取全部信息
+            }
+            if (!$this->_redis->exists($redis_key) || !$data){  // 用户缓存信息查不到则生成
+                $user_route_info = $this->_inner_get_user_auth_info_for_cache_new($user_id);
+                $tree = $this->getTree($user_route_info, 0);
+                if ($tree){
+                    $route_new[$type] = $tree;
+                    // 数组转json存储
+                    foreach($route_new as &$item){
+                        $item = json_encode($item,JSON_UNESCAPED_UNICODE);
+                    }
+                    $this->_redis->hMset($redis_key, $route_new);
+                    $data = $this->_redis->hgetall($redis_key);  // 获取全部信息
+                }
+            }
+            // 解码
+            foreach ($data as &$value){
+                $value = json_decode($value,true);
+            }
+            $this->return_data['data'] = $data[$type];
+        }catch (\Exception $e){
+            $code = $e->getCode();
+            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+                $this->return_data['code'] = $code;
+            }else{
+                $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
+            }
+        }
+        return $this->return_data;
+    }
+
+    /**
+     * 整理路由表无限级分类
+    */
+    public function getTree($data,$pid = 0)
+    {
+        $tree = [];
+        foreach($data as $k => $v)
+        {
+            if($v['pid'] == $pid)
+            {
+//                $v['pid'] = $this->getTree($data, $v['id']);
+//                $tree[] = $v;
+
+                $arr['code'] = $v['code'];
+                $arr['child'] = $this->getTree($data, $v['id']);
+                $tree[] = $arr;
+                unset($arr);
+                unset($data[$k]);
+            }
+        }
+        return $tree;
     }
 
 
@@ -420,7 +533,7 @@ class UserService extends ServiceBase
     {
         try {
             // 开启事务
-            DB::beginTransaction();
+            DB::connection('mysql_common')->beginTransaction();
             // 加密用户密码
             $my_config = \Common::get_config();
             $salt = \Common::get_random_str(4);
@@ -462,7 +575,7 @@ class UserService extends ServiceBase
                 'emergency_contact_address' => $params['emergency_contact_address'],
                 'remark' => $params['remark'],
             ];
-            $create_user_info_result = UserInfo::create($user_info);
+            UserInfo::create($user_info);
             // 用户角色关系 创建关联关系
             $role_id = $params['role_id'];
             if ($role_id && is_array($role_id)){
@@ -475,9 +588,9 @@ class UserService extends ServiceBase
                 }
                 UserRole::insert($user_role_insert_arr);
             }
-            DB::commit();
+            DB::connection('mysql_common')->commit();
         }catch (\Exception $e){
-            DB::rollBack();
+            DB::connection('mysql_common')->rollBack();
             $code = $e->getCode();
             if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
                 $this->return_data['code'] = $code;

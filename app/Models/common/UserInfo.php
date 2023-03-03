@@ -55,16 +55,27 @@ class UserInfo extends Authenticatable
     ];
 
     /**
+     * 默认的查询字段
+    */
+    protected $default_select_fields = ['nation_id','native_place','entry_date','become_data','id_number','birth_date',
+        'education','address','emergency_contact_name','emergency_contact_relation','emergency_contact_phone','emergency_contact_address',
+        'remark'
+    ];
+
+    /**
      * 获取用户信息的查询
      * @date 2023/02/27
      * @param $user_id
      * @param string $field
      * @return bool|mixed
      */
-    public function get_user_info($user_id,$field = "*")
+    public function get_user_info($user_id,$fields = '*')
     {
+        if ($fields == '*'){
+            $fields = $this->default_select_fields;
+        }
         $where['user_id']= $user_id;
-        return $this->select($field)->where($where)->first();
+        return $this->select($fields)->where($where)->first();
     }
 
 }
