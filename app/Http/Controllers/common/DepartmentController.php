@@ -30,8 +30,15 @@ class DepartmentController extends BaseController
         $pageName = 'bio';
         $current_page = request('current_page') ? request('current_page') : 1;;
         $perPage = request('perPage') ? request('perPage') : 2;
+        $pid = request('pid') ;
 
-        $result = $model::where('id', '>', 0)->paginate($perPage, $columns, $pageName, $current_page);;
+
+        $result = $model::where('pid',  $pid )
+            ->select('id','name','pid')
+            // ->with(['user'])
+            // ->with(['pid'])
+            ->with(['children'])
+            ->paginate($perPage, $columns, $pageName, $current_page);;
 
 
         $response['code'] = count($result) > 0  ?'200':'404';
