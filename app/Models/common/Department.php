@@ -39,7 +39,7 @@ class Department extends Model
     // 递归子级
     public function children()
     {
-        return $this->child()->with('children');
+        return $this->child()->with('children:id,name,pid,number');
     }
 
     public function father()

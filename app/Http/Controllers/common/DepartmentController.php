@@ -34,10 +34,12 @@ class DepartmentController extends BaseController
 
 
         $result = $model::where('pid',  $pid )
-            ->select('id','name','pid')
+            ->select('id','name','pid','id')
             // ->with(['user'])
             // ->with(['pid'])
-            ->with(['children'])
+            ->with(['children:id,name,pid,number'])
+            // ->with(['children:id,name'])
+
             ->paginate($perPage, $columns, $pageName, $current_page);;
 
 
