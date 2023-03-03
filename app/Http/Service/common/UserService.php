@@ -408,10 +408,8 @@ class UserService extends ServiceBase
         $auth_result = $this->get_user_auth_info_by_id($user_id,[$my_config[$system_type]]);
         // 获取用户信息缓存
         $user_info = $this->get_user_info_by_id($user_id);
-
         // 合并用户信息数组
         $info = array_merge($auth_result,$user_info);
-
         return [];
     }
 
