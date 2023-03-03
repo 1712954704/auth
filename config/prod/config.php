@@ -20,7 +20,8 @@ return [
         1 => 'hr'
     ],   // 系统类型对照表
     'no_login' => [
-        'api/user/login'
+        'api/user/login',
+        'api/user/clear_user_lock'
     ],  // 免登录接口
 
     /** 业务配置 */

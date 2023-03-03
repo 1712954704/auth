@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\URL;
+use library\Constants\StatusConstants;
 
 
 class UserController extends BaseController
@@ -55,8 +56,26 @@ class UserController extends BaseController
         $user_service = new UserService();
         switch ($this->method) {
             case 'GET': // 添加路由配置
-                // 检测参数
                 $data = $user_service->user_info($this->token,$this->system_type);
+                break;
+            default:
+                return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL, 'Invalid Method');
+        }
+        return \Common::format_return_result($data['code'], $data['msg'], $data['data']);
+    }
+
+
+    /**
+     * 清除用户锁定
+    */
+    public function clear_user_lock()
+    {
+        $user_service = new UserService();
+        switch ($this->method) {
+            case 'POST': // 添加路由配置
+                // 检测参数
+                $account = $this->check_param('account');  // 账号
+                $data = $user_service->clear_user_lock($account);
                 break;
             default:
                 return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL, 'Invalid Method');

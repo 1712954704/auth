@@ -292,8 +292,12 @@ class UserService extends ServiceBase
             $this->user_login_limit($expire_time,$account,UserConstants::USER_LOGIN_LIMIT_TYPE_SUCCESS);
             $this->return_data['data']['token'] = $token_data['token'];
         }catch (\Exception $e){
-            $this->return_data['code'] = $e->getCode();
-            $this->return_data['msg'] = $e->getMessage();
+            $code = $e->getCode();
+            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+                $this->return_data['code'] = $code;
+            }else{
+                $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
+            }
         }
         return $this->return_data;
     }
@@ -360,6 +364,37 @@ class UserService extends ServiceBase
         // 用户锁定操作 todo 后续需要修改为mq异步操作
         User::where('id',$user_info['id'])->update(['status'=>UserConstants::COMMON_STATUS_LOCK]);
     }
+
+    /**
+     * 清除用户锁定(缓存)
+     * @author jack
+     * @dateTime 2023-03-02 13:21
+     * @param string $account         用户账号
+     * @return array
+     */
+    public function clear_user_lock($account)
+    {
+        try {
+            $user_manager = new UserManager();
+            $expire_time = \Common::get_config('user_safe')['login_fail_lock_time'];
+            $key = $user_manager->get_last_key(UserConstants::HASH_USER_LOGIN_LIMIT,$account);
+            //重置redis值
+            $this->_redis->hMSet($key, [
+                'num' => 0,
+                'is_lock' => 0
+            ]);
+            $this->_redis->expire($key, $expire_time);
+        }catch (\Exception $e){
+            $code = $e->getCode();
+            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+                $this->return_data['code'] = $code;
+            }else{
+                $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
+            }
+        }
+        return $this->return_data;
+    }
+
 
     /**
      * 获取用户信息包含权限个及个人配置等
