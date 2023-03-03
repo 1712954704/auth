@@ -33,6 +33,7 @@ class StatusConstants
     const ERROR_UPGRADE_AUTH_LEVEL = 5008; // 请升级权限等级
     const ERROR_UPGRADE_AUTH_LOCK = 5009; // 用户已被锁定
     const ERROR_DATABASE_REPEAT_DELETE = 5010; // 数据不能重复删除
+    const ERROR_UPGRADE_PASSWORD_ERROR = 5011; // 用户密码错误次数超过3次(包含)
 
     // 不合法错误范围段
     const ERROR_ILLEGAL = 40000;
@@ -122,6 +123,7 @@ class StatusConstants
         self::ERROR_UPGRADE_AUTH_LEVEL                                     => 500,
         self::ERROR_UPGRADE_AUTH_LOCK                                      => 500,
         self::ERROR_DATABASE_REPEAT_DELETE                                 => 500,
+        self::ERROR_UPGRADE_PASSWORD_ERROR                                 => 500,
         self::ERROR_FORBIDDEN_USER_CANCEL_UNDERWAY                         => 403,
         self::ERROR_FORBIDDEN_USER_LOGOUT                                  => 403,
         self::ERROR_PASSWORD_OR_ACCOUNT                                    => 501,
@@ -138,7 +140,8 @@ class StatusConstants
         self::ERROR_DATA_CONFLICT => 'Data Conflict',
         self::ERROR_DATA_CONFLICT_CHILD_EXIST => 'Child Exist',
         self::ERROR_DATABASE_REPEAT_DELETE => 'Repeat Delete',
-        self::ERROR_UPGRADE_AUTH_LOCK => '用户已被锁定',
+        self::ERROR_UPGRADE_AUTH_LOCK => 'User is Lock',
+        self::ERROR_UPGRADE_PASSWORD_ERROR => 'Password Incorrect Three ',
         self::ERROR_UPGRADE_AUTH_LEVEL => '请升级权限等级',
         self::ERROR_UPGRADE_APP_VERSION => 'Please Upgrade The Version',
         self::ERROR_NEED_UPGRADE => '您当前的版本过低，请更新到最新版本App',

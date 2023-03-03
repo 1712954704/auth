@@ -253,7 +253,7 @@ class UserService extends ServiceBase
                 $login_verify_num = \Common::get_config('user_safe')['login_verify_num'];
                 $login_lock_num = \Common::get_config('user_safe')['login_lock_num'];
                 if ($lock_data['num'] >= $login_verify_num && $lock_data['num'] < $login_lock_num){
-                    throw new \Exception('',StatusConstants::ERROR_PASSWORD_CHECK_FAIL);
+                    throw new \Exception('',StatusConstants::ERROR_UPGRADE_PASSWORD_ERROR);
                 }elseif ($lock_data['num'] >= $login_lock_num){
                     $this->lock_user(\Common::laravel_to_array($user_info));
                     throw new \Exception('',StatusConstants::ERROR_UPGRADE_AUTH_LOCK);
