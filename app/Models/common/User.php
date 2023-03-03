@@ -55,20 +55,32 @@ class User extends Authenticatable
     ];
 
     /**
+     * 默认的查询字段
+     */
+    protected $default_select_fields = ['id','account','name','name','name','email','structure_id','department_id',
+        'manager_id','position_id','job_type','status','phone','landline_phone',
+        'avatar','uuid','salt','pwd','created_at'
+    ];
+
+
+    /**
      * 获取用户信息的查询
      * @date 2023/02/27
      * @param $user_id
      * @param null $status
-     * @param string $field
+     * @param string | array $field
      * @return bool|mixed
      */
-    public function get_user_by_id($user_id,$status = null,$field = "*")
+    public function get_user_by_id($user_id,$status = null,$fields = "*")
     {
         $where['id']= $user_id;
         if($status !== null){
             $where['status']= $status;
         }
-        return $this->select($field)->where($where)->first();
+        if ($fields == '*'){
+            $fields = $this->default_select_fields;
+        }
+        return $this->select($fields)->where($where)->first();
     }
 
 }

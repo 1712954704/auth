@@ -43,27 +43,6 @@ return [
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
-        'mysql' => [  // 默认公共库
-            'driver' => 'mysql',
-            'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST_COMMON', '127.0.0.1'),
-            'port' => env('DB_PORT_COMMON', '3306'),
-            'database' => env('DB_DATABASE_COMMON', 'forge'),
-            'username' => env('DB_USERNAME_COMMON', 'forge'),
-            'password' => env('DB_PASSWORD_COMMON', ''),
-            'unix_socket' => env('DB_SOCKET_COMMON', ''),
-            'charset' => 'utf8mb4',
-            'collation' => 'utf8mb4_unicode_ci',
-            'prefix' => 'common_',
-            'prefix_indexes' => true,
-            'strict' => true,
-            'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
-        ],
-
-
         'mysql_hr' => [ // hr数据库
             'driver' => 'mysql',
             'url' => env('DATABASE_URL_HR'),

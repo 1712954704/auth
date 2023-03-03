@@ -142,7 +142,7 @@ class StatusConstants
         self::ERROR_DATABASE_REPEAT_DELETE => 'Repeat Delete',
         self::ERROR_UPGRADE_AUTH_LOCK => 'User is Lock',
         self::ERROR_UPGRADE_PASSWORD_ERROR => 'Password Incorrect Three ',
-        self::ERROR_UPGRADE_AUTH_LEVEL => '请升级权限等级',
+        self::ERROR_UPGRADE_AUTH_LEVEL => 'Please Upgrade The Auth',
         self::ERROR_UPGRADE_APP_VERSION => 'Please Upgrade The Version',
         self::ERROR_NEED_UPGRADE => '您当前的版本过低，请更新到最新版本App',
         self::ERROR_MIDDLEWARE_EXCEPTION => '系统繁忙请稍后再试，由此给您带来的不便，我们深表歉意。',
