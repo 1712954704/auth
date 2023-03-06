@@ -12,7 +12,7 @@ use library\Constants\StatusConstants;
 
 class BaseController
 {
-    protected $is_login = 1;  // 是否需要登录 1:是 0:否
+    protected $is_login = 0;  // 是否需要登录 1:是 0:否
 
     protected $system_type = 1; // 请求系统类型  1=hr
 
