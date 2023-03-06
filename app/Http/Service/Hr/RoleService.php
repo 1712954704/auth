@@ -23,15 +23,27 @@ class RoleService extends ServiceBase
 
     /**
      * 获取角色列表
-     * @return mixed
+     * @param array $params
+     * @param int $limit
+     * @param int $offset
+     * @return array
      */
-    public function get_role()
+    public function get_role($params,$limit,$offset)
     {
+        $name = $params['name'];
+        $department_id = $params['department_id'];
         $where = [
             'status' => [1,2]
         ];
+        if ($name){
+            $where[] = ['name','like','%' .$name .'%'];
+        }
+        if ($department_id){
+            $where['department_id'] = $department_id;
+        }
+
         $fields = ['id','name','pid','type','code','department_id','status','created_at'];
-        $result = Role::where($where)->select($fields)->get();
+        $result = Role::where($where)->limit($limit)->offset($offset)->select($fields)->get();
         if (!$result){
             $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
         }
