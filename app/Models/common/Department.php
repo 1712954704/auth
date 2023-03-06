@@ -14,7 +14,10 @@ class Department extends Model
     protected $connection = 'mysql_common';
     protected $guarded = [];
 
-
+    protected $casts = [
+        'updated_at'  => 'date:Y-m-d',
+        'created_at' => 'datetime:Y-m-d',
+    ];
 
     /**
      * 获取与用户相关的电话记录
@@ -22,6 +25,13 @@ class Department extends Model
     public function user()
     {
         return $this->hasOne(User::class, 'id','pid');
+    }
+    /**
+     * 获取与用户相关的名称
+     */
+    public function leader()
+    {
+        return $this->hasOne(User::class, 'id','leader');
     }
     /**
      * 获取与用户相关的电话记录
@@ -39,7 +49,7 @@ class Department extends Model
     // 递归子级
     public function children()
     {
-        return $this->child()->with('children:id,name,structure_id,pid,encode,order');
+        return $this->child()->with('children:id,name,structure_id,pid,encode,order,created_at,updated_at');
     }
 
     public function father()
