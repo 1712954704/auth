@@ -44,15 +44,16 @@ class RoleService extends ServiceBase
 
         $fields = ['id','name','pid','type','code','department_id','status','created_at'];
         $result = Role::where($where)->limit($limit)->offset($offset)->select($fields)->get();
+        $this->return_data['data']['total'] = Role::where($where)->select($fields)->count();
         if (!$result){
             $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
         }
-        $this->return_data['data'] = \Common::laravel_to_array($result);
+        $this->return_data['data']['data'] = \Common::laravel_to_array($result);
         // 查询所有部门名称
-        $department_ids = array_column($this->return_data['data'],'department_id');
+        $department_ids = array_column($this->return_data['data']['data'],'department_id');
         $department_list = Structure::whereIn('id',$department_ids)->select(['id','name'])->get();
         $department_list = array_column(\Common::laravel_to_array($department_list),'name','id');
-        foreach ($this->return_data['data'] as &$item){
+        foreach ($this->return_data['data']['data'] as &$item){
             $item['department_name'] = $department_list[$item['department_id']] ?? '';
         }
         return $this->return_data;
