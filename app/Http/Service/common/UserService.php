@@ -16,6 +16,7 @@ use App\Models\Hr\UserRole;
 use Illuminate\Support\Facades\DB;
 use library\Constants\Model\UserConstants;
 use library\Constants\StatusConstants;
+use zjkal\TimeHelper;
 
 class UserService extends ServiceBase
 {
@@ -625,6 +626,7 @@ class UserService extends ServiceBase
     {
         $job_number = $params['job_number'] ?? '';
         $job_type = $params['job_type'] ?? '';
+        $department_id = $params['department_id'] ?? '';
         $where = [];
         $status = $params['status'];
         $where['status'] = $status;
@@ -634,11 +636,15 @@ class UserService extends ServiceBase
         if ($job_type){
             $where['job_type'] = $job_type;
         }
+        if ($department_id){
+            $where['department_id'] = $department_id;
+        }
         if ($id){
             $where['id'] = $id;
         }
 
         try {
+            $time = time();
 //            $need_fields = ['id','job_number','account', 'phone','type','department_id','status'];
             // 只获取id 然后从缓存获取用户信息
             $need_fields = ['id'];
@@ -658,7 +664,13 @@ class UserService extends ServiceBase
                 $item['job_type'] = $user_info['job_type'] ?? '';
                 $item['department_id'] = $user_info['department_id'] ?? '';
                 $item['entry_date'] = isset($user_info['entry_date']) && !empty($user_info['entry_date']) ? intval($user_info['entry_date']) : '';
-                $item['entry_limit'] = '123';
+
+//                var_dump(TimeHelper::diffYears($time,'1641448894'));die();
+//                if ($item['entry_date']){  // 计算时间差值
+////                    $item['entry_date'] = TimeHelper::diffYears($time,$item['entry_date']);
+//                    $item['entry_date'] = TimeHelper::diffYears($time,'1641448894');
+//                }
+                $item['entry_limit'] = '';
             }
             $department_ids = array_unique(array_column($this->return_data['data']['list'],'department_id'));
             $department_list = Structure::whereIn('id',$department_ids)->select(['id','name'])->get();

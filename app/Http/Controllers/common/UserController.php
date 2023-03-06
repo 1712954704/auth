@@ -152,8 +152,27 @@ class UserController extends BaseController
                 $id               = $this->data_arr['id'] ?? null;     // 主键id
                 $params['job_number'] = $this->data_arr['job_number'] ?? null;     // 员工工号
                 $params['job_type'] = $this->data_arr['job_type'] ?? null;     // 员工类型
+                $params['department_id'] = $this->data_arr['department_id'] ?? null;     // 员工类型
                 $offset  = ($page - 1) * $limit;
                 $data = $user_service->get_list($params,$id,$offset,$limit);
+                break;
+            default:
+                return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL, 'Invalid Method');
+        }
+        return \Common::format_return_result($data['code'], $data['msg'], $data['data']);
+    }
+
+    /**
+     * 重置用户缓存信息
+     */
+    public function user_reset()
+    {
+        $user_service = new UserService();
+        switch ($this->method) {
+            case 'POST': // 添加路由配置
+                // 检测参数
+                $id = $this->check_param('id');  // 账号
+                $data = $user_service->user_reset($id);
                 break;
             default:
                 return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL, 'Invalid Method');
