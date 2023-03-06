@@ -37,6 +37,7 @@ class RoleController extends BaseController
                 $params['type']        = $this->check_param('type');  // 1=全局 2=组织
                 $params['title']          = $this->data_arr['title'] ?? '';
                 $params['remark']         = $this->data_arr['remark'] ?? '';
+                $params['code']         = $this->check_param('code');
                 $params['pid']            = $this->check_param('pid',0);
                 $auth                     = $this->check_param('auth');
                 $data = $role_service->add_role($params,$auth);
