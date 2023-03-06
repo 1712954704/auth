@@ -65,7 +65,7 @@ class StructureController extends BaseController
                 $params['order']          = $this->data_arr['order'] ?? null;  // 排序
                 $params['remark']         = $this->data_arr['remark'] ?? null;  // 备注说明
                 $params['short_name']     = $this->data_arr['short_name'] ?? '';  // 单位简称
-                $params['area_id']        = $this->check_param('area_id');  // 所属地区 todo 需要换成id表关联形式.做一个地址表 暂时用文字输入
+                $params['area_id']        = $this->check_param('area_id');  // 所属地区
                 $params['pid']            = $this->check_param('pid',0); // 上级单位
                 $params['phone']          = $this->data_arr['phone'] ?? '';  // 单位电话
                 $params['home_page']      = $this->data_arr['home_page'] ?? '';  // 单位主页

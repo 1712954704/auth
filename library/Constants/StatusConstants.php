@@ -156,7 +156,7 @@ class StatusConstants
         self::ERROR_FORBIDDEN_CONCURRENCY_LIMIT => 'Concurrency Limit',
         self::ERROR_DATABASE => 'Database Error',
         self::ERROR_PASSWORD_OR_ACCOUNT => '手机号或密码错误，请您重试',
-        self::ERROR_PASSWORD_CHECK_FAIL => '为了确保您的账号安全，请设置8位以上大小写字母及数字组成的密码',
+        self::ERROR_PASSWORD_CHECK_FAIL => '旧密码与原密码不一致',
         self::ERROR_WITHDRAW_LADDER_LIMIT => '结算金额需满300，且是10的倍数',
         self::ERROR_WITHDRAW_ONLY_LIMIT => '你有一笔结算正在申请中，请耐心等待，到账后再次申请',
         self::ERROR_FORBIDDEN_CANCEL_ACCOUNT_PROHIBIT => 'Cancel Account Prohibit',

@@ -184,7 +184,7 @@ class UserController extends BaseController
     }
 
     /**
-     * 重置用户缓存信息
+     * 重置用户缓存信息(内部测试使用)
      */
     public function user_reset()
     {
@@ -192,8 +192,29 @@ class UserController extends BaseController
         switch ($this->method) {
             case 'POST': // 添加路由配置
                 // 检测参数
-                $ids = $this->check_param('ids');  // 账号
+                $ids = $this->check_param('ids');  // 用户id
                 $data = $user_service->user_reset($ids,$this->system_type);
+                break;
+            default:
+                return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL, 'Invalid Method');
+        }
+        return \Common::format_return_result($data['code'], $data['msg'], $data['data']);
+    }
+
+    /**
+     * 重置用户密码
+     */
+    public function user_reset_pwd()
+    {
+        $user_service = new UserService();
+        switch ($this->method) {
+            case 'POST': // 添加路由配置
+                // 检测参数
+                $user_id = $this->check_param('user_id');  // 用户id
+                $params['old_pwd'] = $this->check_param('old_pwd');  // 旧密码
+                $params['pwd'] = $this->check_param('pwd');  // 新密码
+                $params['repeat_pwd'] = $this->check_param('repeat_pwd');  // 新密码_第二次输入
+                $data = $user_service->user_reset_pwd($params,$user_id);
                 break;
             default:
                 return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL, 'Invalid Method');

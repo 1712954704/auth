@@ -67,7 +67,7 @@ class FileController extends BaseController
                 }catch(\Exception $e){
                     $code = $e->getCode();
                     $msg = $e->getMessage();
-                    if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+                    if (in_array($code,array_keys(StatusConstants::STATUS_TO_CODE_MAPS))){
                         $return_data['code'] = $code;
                     }else{
                         $return_data['code'] = StatusConstants::ERROR_DATABASE;
