@@ -27,10 +27,12 @@ use \App\Http\Controllers\common\FileController;
 Route::controller(UserController::class)->group(function () {
     Route::post('/user/login', 'login');   // 登录
     Route::get('/user/info', 'user_info');   // 获取用户信息
-    Route::post('/user/register', 'register');   // 用户新增
+    Route::post('/user/register', 'user_register_or_edit');   // 用户新增
     Route::post('/user/clear_user_lock', 'clear_user_lock');   // 清除用户锁定
-    Route::get('/user/list', 'user_operate');   // 获取用户列表
+    Route::get('/user/list', 'user_list');   // 获取用户列表
     Route::post('/user/user_reset', 'user_reset');   // 重置用户缓存信息
+    Route::put('/user/edit', 'user_register_or_edit');   // 编辑用户
+    Route::delete('/user/del', 'user_del');   // 删除用户
 });
 
 Route::controller(AuthController::class)->group(function () {
