@@ -644,7 +644,7 @@ class UserService extends ServiceBase
         }
 
         try {
-            $time = time();
+            $time = date('Y-m-d');
 //            $need_fields = ['id','job_number','account', 'phone','type','department_id','status'];
             // 只获取id 然后从缓存获取用户信息
             $need_fields = ['id'];
@@ -654,32 +654,35 @@ class UserService extends ServiceBase
             if (!$result){
                 throw new \Exception('',StatusConstants::ERROR_DATABASE);
             }
-            $this->return_data['data']['list'] = \Common::laravel_to_array($result);
-            foreach ($this->return_data['data']['list'] as &$item){
+            $this->return_data['data']['data'] = \Common::laravel_to_array($result);
+            foreach ($this->return_data['data']['data'] as &$item){
                 // 获取用户缓存信息
                 $user_info = $this->get_user_info_by_id($item['id'])['data'] ?? '';
                 $item['job_number'] = $user_info['job_number'] ?? '';
                 $item['account'] = $user_info['account'] ?? '';
+                $item['name'] = $user_info['name'] ?? '';
                 $item['phone'] = $user_info['phone'] ?? '';
                 $item['job_type'] = $user_info['job_type'] ?? '';
                 $item['department_id'] = $user_info['department_id'] ?? '';
                 $item['entry_date'] = isset($user_info['entry_date']) && !empty($user_info['entry_date']) ? intval($user_info['entry_date']) : '';
-
-//                var_dump(TimeHelper::diffYears($time,'1641448894'));die();
-//                if ($item['entry_date']){  // 计算时间差值
-////                    $item['entry_date'] = TimeHelper::diffYears($time,$item['entry_date']);
-//                    $item['entry_date'] = TimeHelper::diffYears($time,'1641448894');
-//                }
-                $item['entry_limit'] = '';
+                if ($item['entry_date']){  // 计算时间差值
+                    list($year,$month,$days) = $this->DiffDate(date('Y-m-d',$item['entry_date']),$time);
+                    $item['entry_date'] = $year.'年'.$month.'月'.$days.'日';
+                }else{
+                    $item['entry_limit'] = '';
+                }
             }
-            $department_ids = array_unique(array_column($this->return_data['data']['list'],'department_id'));
+            $department_ids = array_unique(array_column($this->return_data['data']['data'],'department_id'));
             $department_list = Structure::whereIn('id',$department_ids)->select(['id','name'])->get();
             $department_list = array_column(\Common::laravel_to_array($department_list),'name','id');
-            foreach ($this->return_data['data']['list'] as &$item){
+            foreach ($this->return_data['data']['data'] as &$item){
                 // 获取用户缓存信息
                 $item['department_name'] = $department_list[$item['department_id']] ?? '';
             }
         }catch (\Exception $e){
+            var_dump($e->getLine());
+            var_dump($e->getMessage());die();
+            var_dump($e->getMessage());die();
             $code = $e->getCode();
             if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
                 $this->return_data['code'] = $code;
@@ -688,6 +691,37 @@ class UserService extends ServiceBase
             }
         }
         return $this->return_data;
+    }
+
+    /**
+    +----------------------------------------------------------
+     * 功能：计算两个日期相差 年 月 日
+    +----------------------------------------------------------
+     * @param date   $date1 起始日期
+     * @param date   $date2 截止日期日期
+    +----------------------------------------------------------
+     * @return array
+    +----------------------------------------------------------
+     */
+    public function DiffDate($date1, $date2) {
+        if (strtotime($date1) > strtotime($date2)) {
+            $ymd = $date2;
+            $date2 = $date1;
+            $date1 = $ymd;
+        }
+        list($y1, $m1, $d1) = explode('-', $date1);
+        list($y2, $m2, $d2) = explode('-', $date2);
+        $y = $m = $d = $_m = 0;
+        $math = ($y2 - $y1) * 12 + $m2 - $m1;
+        $y = round($math / 12);
+        $m = intval($math % 12);
+        $d = (mktime(0, 0, 0, $m2, $d2, $y2) - mktime(0, 0, 0, $m2, $d1, $y2)) / 86400;
+        if ($d < 0) {
+            $m -= 1;
+            $d += date('j', mktime(0, 0, 0, $m2, 0, $y2));
+        }
+        $m < 0 && $y -= 1;
+        return array($y, $m, $d);
     }
 
 
