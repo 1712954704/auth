@@ -30,6 +30,7 @@ Route::controller(UserController::class)->group(function () {
     Route::post('/user/register', 'register');   // 用户新增
     Route::post('/user/clear_user_lock', 'clear_user_lock');   // 清除用户锁定
     Route::get('/user/list', 'user_operate');   // 获取用户列表
+    Route::post('/user/user_reset', 'user_reset');   // 重置用户缓存信息
 });
 
 Route::controller(AuthController::class)->group(function () {

@@ -28,7 +28,6 @@ class UserConstants extends ModelConstants
      * redis缓存
     */
     const HASH_USER_INFO_PREFIX = \CacheConstants::MODULE_USER . 'info:';                  // 用户信息缓存 user:info:用户id
-//    const HASH_USER_AUTH_INFO_PREFIX = \CacheConstants::MODULE_USER . 'auth:';          // 用户权限信息缓存 user:auth:用户id
     const HASH_USER_AUTH_PREFIX = \CacheConstants::MODULE_USER . 'auth:';          // 用户权限信息缓存 user:auth:用户id
     const HASH_USER_ROUTE_PREFIX = \CacheConstants::MODULE_USER . 'route:';        // 用户路由表信息缓存(和前端对照使用) user:route:用户id
 
