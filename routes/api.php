@@ -29,6 +29,7 @@ Route::controller(UserController::class)->group(function () {
     Route::get('/user/info', 'user_info');   // 获取用户信息
     Route::post('/user/register', 'register');   // 用户新增
     Route::post('/user/clear_user_lock', 'clear_user_lock');   // 清除用户锁定
+    Route::get('/user/list', 'user_operate');   // 获取用户列表
 });
 
 Route::controller(AuthController::class)->group(function () {

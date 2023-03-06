@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\URL;
+use library\Constants\Model\UserConstants;
 use library\Constants\StatusConstants;
 
 
@@ -125,6 +126,34 @@ class UserController extends BaseController
                 $params['emergency_contact_address'] = $this->data_arr['emergency_contact_address'];  // 紧急联系人现住址
                 $params['remark'] = $this->data_arr['remark'];  // 备注
                 $data = $user_service->register($params);
+                break;
+            default:
+                return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL, 'Invalid Method');
+        }
+        return \Common::format_return_result($data['code'], $data['msg'], $data['data']);
+    }
+
+
+    /**
+     * 获取用户列表
+     */
+    public function user_operate()
+    {
+        $user_service = new UserService();
+        switch ($this->method) {
+            case 'GET': // 获取用户列表
+                $page             = $this->get_safe_int_param('page',1);
+                $limit            = $this->get_safe_int_param('limit',10);
+                if (isset($this->data_arr['status']) && in_array($this->data_arr['status'],[UserConstants::COMMON_STATUS_NORMAL,UserConstants::COMMON_STATUS_LOCK,UserConstants::COMMON_STATUS_DISABLE])){
+                    $params['status'] = $this->data_arr['status'];
+                }else{
+                    $params['status'] = [UserConstants::COMMON_STATUS_NORMAL,UserConstants::COMMON_STATUS_LOCK,UserConstants::COMMON_STATUS_DISABLE];
+                }
+                $id               = $this->data_arr['id'] ?? null;     // 主键id
+                $params['job_number'] = $this->data_arr['job_number'] ?? null;     // 员工工号
+                $params['job_type'] = $this->data_arr['job_type'] ?? null;     // 员工类型
+                $offset  = ($page - 1) * $limit;
+                $data = $user_service->get_list($params,$id,$offset,$limit);
                 break;
             default:
                 return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL, 'Invalid Method');
