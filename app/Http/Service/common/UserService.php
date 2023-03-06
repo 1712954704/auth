@@ -14,6 +14,7 @@ use App\Models\common\UserToken;
 use App\Http\Service\ServiceBase;
 use App\Models\Hr\UserRole;
 use Illuminate\Support\Facades\DB;
+use library\Constants\Model\ModelConstants;
 use library\Constants\Model\UserConstants;
 use library\Constants\StatusConstants;
 use zjkal\TimeHelper;
@@ -533,20 +534,17 @@ class UserService extends ServiceBase
 
 
     /**
-     * 注册
+     * 注册 todo 缺少更新用户缓存信息步骤
      * @author jack
      * @dateTime 2023-03-03 12:55
      * @param array $params
+     * @param int $type 1=新增 2=编辑
      * @return mixed
      */
-    public function register($params)
+    public function register_or_edit($params,$type)
     {
         try {
-            // 开启事务
-            DB::connection('mysql_common')->beginTransaction();
-            // 加密用户密码
-            $my_config = \Common::get_config();
-            $salt = \Common::get_random_str(4);
+            $user_id = $params['user_id'];
             // 主表信息
             $user = [
                 'account' => $params['account'],
@@ -563,14 +561,9 @@ class UserService extends ServiceBase
                 'phone' => $params['phone'],
                 'landline_phone' => $params['landline_phone'],
                 'avatar' => $params['avatar'],
-                'uuid' => \Common::guid(),
-                'salt' => $salt,
-                'pwd' => sha1($salt.sha1($my_config['user_safe']['default_password'])), // 初始密码为默认设置
             ];
-            $create_user_result = User::create($user);
             // 副表信息
             $user_info = [
-                'user_id' => $create_user_result->id,
                 'nation_id' => $params['nation_id'],
                 'native_place' => $params['native_place'],
                 'entry_date' => $params['entry_date'],
@@ -585,19 +578,90 @@ class UserService extends ServiceBase
                 'emergency_contact_address' => $params['emergency_contact_address'],
                 'remark' => $params['remark'],
             ];
-            UserInfo::create($user_info);  // todo 需要修改为创建完成后设置缓存 改为rabbitmq操作
-            // 用户角色关系 创建关联关系
-            $role_id = $params['role_id'];
-            if ($role_id && is_array($role_id)){
-                $user_role_insert_arr = [];
-                foreach ($role_id as $item){
-                    $user_role_insert_arr[] = [
-                        'user_id' => $create_user_result->id,
-                        'role_id' => $item,
+            // 开启事务
+            DB::connection('mysql_common')->beginTransaction();
+            switch ($type)
+            {
+                case 1:  // 新增
+                    // 加密用户密码 使用配置默认密码
+                    $my_config = \Common::get_config();
+                    $salt = \Common::get_random_str(4);
+                    $user['uuid'] = \Common::guid();
+                    $user['salt'] = $salt;
+                    $user['pwd'] = sha1($salt.sha1($my_config['user_safe']['default_password'])); // 初始密码为默认设置;
+                    $create_user_result = User::create($user);
+
+                    $user_info['user_id'] = $create_user_result->id;
+                    UserInfo::create($user_info);  // todo 需要修改为创建完成后设置缓存 改为rabbitmq操作
+                    // 用户角色关系 创建关联关系
+                    $role_id = $params['role_id'];
+                    if ($role_id && is_array($role_id)){
+                        $user_role_insert_arr = [];
+                        foreach ($role_id as $item){
+                            $user_role_insert_arr[] = [
+                                'user_id' => $create_user_result->id,
+                                'role_id' => $item,
+                            ];
+                        }
+                        UserRole::insert($user_role_insert_arr);
+                    }
+                    break;
+                case 2:
+                    $where = [
+                        'id' => $user_id,
                     ];
-                }
-                UserRole::insert($user_role_insert_arr);
+                    User::where($where)->update($user);
+                    $user_info['user_id'] = $user_id;
+                    UserInfo::where($where)->update($user_info);  // todo 需要修改为创建完成后设置缓存 改为rabbitmq操作
+                    // 用户角色关系 先删除再创建关联关系
+                    $role_id = $params['role_id'];
+                    if ($role_id && is_array($role_id)){
+                        UserRole::where(['user_id'=>$user_id])->update(['status' => ModelConstants::COMMON_STATUS_DELETE]);
+                        $user_role_insert_arr = [];
+                        foreach ($role_id as $item){
+                            $user_role_insert_arr[] = [
+                                'user_id' => $user_id,
+                                'role_id' => $item,
+                            ];
+                        }
+                        UserRole::insert($user_role_insert_arr);
+                    }
+                    break;
+                default:
+                    break;
             }
+            DB::connection('mysql_common')->commit();
+            // 更新用缓存
+            $this->user_reset([$user_id],1);
+        }catch (\Exception $e){
+            DB::connection('mysql_common')->rollBack();
+            var_dump($e->getLine());
+            var_dump($e->getMessage());die();
+            $code = $e->getCode();
+            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+                $this->return_data['code'] = $code;
+            }else{
+                $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
+            }
+        }
+        return $this->return_data;
+    }
+
+
+
+    /**
+     * 清除用户锁定(缓存)
+     * @author jack
+     * @dateTime 2023-03-02 13:21
+     * @param string $user_id         用户id
+     * @return array
+     */
+    public function user_del($user_id)
+    {
+        try {
+            $where['id'] = $user_id;
+            DB::connection('mysql_common')->beginTransaction();
+            User::where($where)->update(['status' => ModelConstants::COMMON_STATUS_DELETE]);
             DB::connection('mysql_common')->commit();
         }catch (\Exception $e){
             DB::connection('mysql_common')->rollBack();
