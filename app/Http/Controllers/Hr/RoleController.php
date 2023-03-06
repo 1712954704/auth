@@ -29,16 +29,20 @@ class RoleController extends BaseController
         switch ($this->method) {
             case 'GET':  // 获取角色列表
                 // 检测参数
-                $data = $role_service->get_role();
+                $page             = $this->get_safe_int_param('page',1);
+                $limit            = $this->get_safe_int_param('limit',10);
+                $offset = ($page - 1) * $limit;
+                $params['name']         = $this->data_arr['name'] ?? '';   // 角色名称
+                $params['department_id']         = $this->data_arr['department_id'] ?? '';   // 部门id
+                $data = $role_service->get_role($params,$limit,$offset);
                 break;
             case 'POST':  // 添加角色
                 // 检测参数
-
                 $params['name']           = $this->check_param('name'); // 名称
                 $params['type']        = $this->check_param('type',1);  // 1=全局 2=组织
                 $params['pid']            = $this->check_param('pid',0);  // 父级id
                 $params['code']            = $this->check_param('code',0);  // 编码
-                $params['department_id']         = $this->data_arr['department_id'] ?? '';   // 备注
+                $params['department_id']         = $this->data_arr['department_id'] ?? '';   // 部门id
                 $params['order']            = $this->check_param('order',0);  // 排序
                 $params['status']            = $this->check_param('status',0);  // 状态 1=正常 2=停用
                 $params['remark']         = $this->data_arr['remark'] ?? '';   // 备注
