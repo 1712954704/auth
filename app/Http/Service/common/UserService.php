@@ -7,6 +7,7 @@
 namespace App\Http\Service\Common;
 
 use App\Http\Manager\Cache\UserManager;
+use App\Models\Common\Structure;
 use App\Models\common\User;
 use App\Models\common\UserInfo;
 use App\Models\common\UserToken;
@@ -121,51 +122,37 @@ class UserService extends ServiceBase
      */
     public function get_user_auth_info_by_id($user_id,$fields=[])
     {
-        $user_manager = new UserManager();
-        $redis_key = $user_manager->get_user_auth_cache_key($user_id);
-        // 使用token获取用户缓存信息
-        if ($fields){
-            $data = $this->_redis->hmget($redis_key,$fields);  // 获取全部信息
-        }else{
-            $data = $this->_redis->hgetall($redis_key);  // 获取全部信息
-        }
-        if ( !$this->_redis->exists($redis_key) || !$data){  // 用户缓存信息查不到则生成
-            $user_auth_info = $this->_inner_get_user_auth_info_for_cache($user_id);
-            if ($user_auth_info){
-                $user_auth_info_new = array_column($user_auth_info,'name'); // 只获取单列
-                // 数组转json存储
-                foreach($user_auth_info_new as &$item){
-                    $item = json_encode($item,JSON_UNESCAPED_UNICODE);
-                }
-                $this->_redis->hMset($redis_key, $user_auth_info_new);
+        try {
+            $user_manager = new UserManager();
+            $redis_key = $user_manager->get_user_auth_cache_key($user_id);
+            // 使用token获取用户缓存信息
+            if ($fields){
+                $data = $this->_redis->hmget($redis_key,$fields);  // 获取全部信息
+            }else{
                 $data = $this->_redis->hgetall($redis_key);  // 获取全部信息
             }
+            if ( !$this->_redis->exists($redis_key) || !$data || array_values($fields) != array_keys($data)){  // 用户缓存信息查不到则生成
+                // todo 目前只获取了hr系统的权限 后续需要扩充
+                $user_auth_info = $this->_inner_get_user_auth_info_for_cache($user_id);
+                if ($user_auth_info){
+//                $user_auth_info_new = array_column($user_auth_info,'name'); // 只获取单列
+                    // 数组转json存储
+                    foreach($user_auth_info as &$item){
+                        $item = json_encode($item,JSON_UNESCAPED_UNICODE);
+                    }
+                    $this->_redis->hMset($redis_key, $user_auth_info);
+                    $data = $this->_redis->hgetall($redis_key);  // 获取全部信息
+                }
+            }
+            // 解码
+            foreach ($data as &$value){
+                $value = json_decode($value,true);
+            }
+            return $data;
+        }catch (\Exception $e){
+            // 记录错误日志
         }
-        // 解码
-        foreach ($data as &$value){
-            $value = json_decode($value,true);
-        }
-        return $data;
     }
-
-    /**
-     * 更新用户路由表缓存信息
-     * @scope 内部使用
-     *
-     * @param int $user_id 用户id
-     *
-     * @return array
-     */
-    public function _inner_update_user_routes_for_cache($user_id)
-    {
-
-        $user_auth_info = $this->_inner_get_user_auth_info_for_cache($user_id);
-
-
-
-        return [];
-    }
-
 
 
     /**
@@ -202,12 +189,30 @@ class UserService extends ServiceBase
     public function _inner_get_user_auth_info_for_cache($user_id,$database_name='mysql_hr')
     {
         // 查询用户权限信息
-        $sql = "select a.name,is_menu,code,pid from hr_auth_rule a left join hr_role_auth_rule b on a.id = b.auth_rule_id
-        left join hr_user_role c on b.role_id=c.role_id where c.user_id = ".$user_id;
+        $sql = "select DISTINCT(a.id), a.name,a.type,a.code,a.pid,a.method,a.title from hr_auth_rule a left join hr_role_auth_rule b on a.id = b.auth_rule_id
+        left join hr_user_role c on b.role_id=c.role_id where a.status = 1 and c.user_id = ".$user_id;
         $result = DB::connection($database_name)->select($sql);
-        $return_data[NOW_SYSTEM_TYPE] = array_column(array_map('get_object_vars', $result),'name');
+//        $return_data[NOW_SYSTEM_TYPE] = array_column(array_map('get_object_vars', $result),'name');
+        $return_data[NOW_SYSTEM_TYPE] = $this->clear_auth_array_data(array_map('get_object_vars', $result));
         return $return_data;
     }
+
+    /**
+     * 整理路由规则数据格式
+     * @param array $data
+     * @return array
+    */
+    public function clear_auth_array_data($data)
+    {
+        $arr = [];
+        foreach ($data as $item){
+            if ($item['name']){
+                $arr[$item['name']][] = $item['method'];
+            }
+        }
+        return $arr;
+    }
+
 
     /**
      * 获取要存储到权限缓存里的用户信息数据
@@ -220,8 +225,8 @@ class UserService extends ServiceBase
      */
     public function _inner_get_user_auth_info_for_cache_new($user_id,$database_name='mysql_hr')
     {
-        // 查询用户权限信息 todo 当出现多个角色时并且路由重复时会查询多条重复的路由 需要修改 暂时这样写
-        $sql = "select a.id,a.code,a.pid from hr_auth_rule a left join hr_role_auth_rule b on a.id = b.auth_rule_id
+        // 查询用户权限信息
+        $sql = "select DISTINCT(a.id),a.code,a.pid,a.type,a.title from hr_auth_rule a left join hr_role_auth_rule b on a.id = b.auth_rule_id
         left join hr_user_role c on b.role_id=c.role_id where c.user_id = ".$user_id;
         $result = DB::connection($database_name)->select($sql);
         return array_map('get_object_vars', $result);
@@ -449,7 +454,7 @@ class UserService extends ServiceBase
      * 获取用户路由表信息
      * @author jack
      * @dateTime 2023-03-02 13:21
-     * @param string $token         用户token
+     * @param string $user_id         用户token
      * @param string $system_type  系统类型
      * @return array
      */
@@ -471,22 +476,24 @@ class UserService extends ServiceBase
             }
             if (!$this->_redis->exists($redis_key) || !$data){  // 用户缓存信息查不到则生成
                 $user_route_info = $this->_inner_get_user_auth_info_for_cache_new($user_id);
-                $tree = $this->getTree($user_route_info, 0);
-                if ($tree){
-                    $route_new[$type] = $tree;
-                    // 数组转json存储
-                    foreach($route_new as &$item){
-                        $item = json_encode($item,JSON_UNESCAPED_UNICODE);
+                if ($user_route_info){
+                    $tree = $this->getTree($user_route_info, 0);
+                    if ($tree){
+                        $route_new[$type] = $tree;
+                        // 数组转json存储
+                        foreach($route_new as &$item){
+                            $item = json_encode($item,JSON_UNESCAPED_UNICODE);
+                        }
+                        $this->_redis->hMset($redis_key, $route_new);
+                        $data = $this->_redis->hgetall($redis_key);  // 获取全部信息
                     }
-                    $this->_redis->hMset($redis_key, $route_new);
-                    $data = $this->_redis->hgetall($redis_key);  // 获取全部信息
                 }
             }
             // 解码
             foreach ($data as &$value){
                 $value = json_decode($value,true);
             }
-            $this->return_data['data'] = $data[$type];
+            $this->return_data['data'] = $data[$type] ?? [];
         }catch (\Exception $e){
             $code = $e->getCode();
             if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
@@ -500,6 +507,9 @@ class UserService extends ServiceBase
 
     /**
      * 整理路由表无限级分类
+     * @param array $data
+     * @param int $pid
+     * @return array
     */
     public function getTree($data,$pid = 0)
     {
@@ -508,10 +518,9 @@ class UserService extends ServiceBase
         {
             if($v['pid'] == $pid)
             {
-//                $v['pid'] = $this->getTree($data, $v['id']);
-//                $tree[] = $v;
-
                 $arr['code'] = $v['code'];
+                $arr['type'] = $v['type'];
+                $arr['title'] = $v['title'];
                 $arr['child'] = $this->getTree($data, $v['id']);
                 $tree[] = $arr;
                 unset($arr);
@@ -591,6 +600,74 @@ class UserService extends ServiceBase
             DB::connection('mysql_common')->commit();
         }catch (\Exception $e){
             DB::connection('mysql_common')->rollBack();
+            $code = $e->getCode();
+            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+                $this->return_data['code'] = $code;
+            }else{
+                $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
+            }
+        }
+        return $this->return_data;
+    }
+
+
+    /**
+     * 获取用户列表
+     * @param array $params [
+     *      name => xxx   // 待搜索的值
+     * ]
+     * @param int $id
+     * @param int $offset
+     * @param int $limit
+     * @return array
+     */
+    public function get_list($params,$id = null,$offset = 0,$limit = 10)
+    {
+        $job_number = $params['job_number'] ?? '';
+        $job_type = $params['job_type'] ?? '';
+        $where = [];
+        $status = $params['status'];
+        $where['status'] = $status;
+        if ($job_number){
+            $where[] = ['job_number','like','%' .$job_number .'%'];
+        }
+        if ($job_type){
+            $where['job_type'] = $job_type;
+        }
+        if ($id){
+            $where['id'] = $id;
+        }
+
+        try {
+//            $need_fields = ['id','job_number','account', 'phone','type','department_id','status'];
+            // 只获取id 然后从缓存获取用户信息
+            $need_fields = ['id'];
+            $result = User::where($where)->offset($offset)->limit($limit)->select($need_fields)->get();
+
+            $this->return_data['data']['total'] = User::where($where)->count();
+            if (!$result){
+                throw new \Exception('',StatusConstants::ERROR_DATABASE);
+            }
+            $this->return_data['data']['list'] = \Common::laravel_to_array($result);
+            foreach ($this->return_data['data']['list'] as &$item){
+                // 获取用户缓存信息
+                $user_info = $this->get_user_info_by_id($item['id'])['data'] ?? '';
+                $item['job_number'] = $user_info['job_number'] ?? '';
+                $item['account'] = $user_info['account'] ?? '';
+                $item['phone'] = $user_info['phone'] ?? '';
+                $item['job_type'] = $user_info['job_type'] ?? '';
+                $item['department_id'] = $user_info['department_id'] ?? '';
+                $item['entry_date'] = isset($user_info['entry_date']) && !empty($user_info['entry_date']) ? intval($user_info['entry_date']) : '';
+                $item['entry_limit'] = '123';
+            }
+            $department_ids = array_unique(array_column($this->return_data['data']['list'],'department_id'));
+            $department_list = Structure::whereIn('id',$department_ids)->select(['id','name'])->get();
+            $department_list = array_column(\Common::laravel_to_array($department_list),'name','id');
+            foreach ($this->return_data['data']['list'] as &$item){
+                // 获取用户缓存信息
+                $item['department_name'] = $department_list[$item['department_id']] ?? '';
+            }
+        }catch (\Exception $e){
             $code = $e->getCode();
             if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
                 $this->return_data['code'] = $code;
