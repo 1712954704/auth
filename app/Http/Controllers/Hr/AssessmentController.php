@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Hr;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class DepartmentController extends Controller
+class AssessmentController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,8 +15,6 @@ class DepartmentController extends Controller
     public function index()
     {
         //
-        echo 1236;
-        // return "index";
     }
 
     /**
@@ -38,7 +37,6 @@ class DepartmentController extends Controller
     public function show($id)
     {
         //
-        // return  "show".$id;
     }
 
     /**

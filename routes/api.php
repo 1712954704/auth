@@ -63,3 +63,4 @@ Route::controller(FileController::class)->group(function () {
 Route::apiResource('department',\App\Http\Controllers\common\DepartmentController::class);
 Route::apiResource("hr/check",\App\Http\Controllers\Hr\CheckController::class);
 Route::apiResource("hr/position",\App\Http\Controllers\Hr\PositionController::class);
+Route::apiResource("hr/assessment",\App\Http\Controllers\Hr\AssessmentController::class);
