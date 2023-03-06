@@ -7,6 +7,7 @@
 namespace App\Http\Service\Hr;
 
 use App\Http\Service\ServiceBase;
+use App\Models\Common\Structure;
 use App\Models\Hr\Role;
 use App\Models\Hr\RoleAuthRule;
 use App\Models\Hr\UserRole;
@@ -26,11 +27,22 @@ class RoleService extends ServiceBase
      */
     public function get_role()
     {
-        $result = Role::get();
+        $where = [
+            'status' => [1,2]
+        ];
+        $fields = ['id','name','pid','type','code','department_id','status','created_at'];
+        $result = Role::where($where)->select($fields)->get();
         if (!$result){
             $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
         }
         $this->return_data['data'] = \Common::laravel_to_array($result);
+        // 查询所有部门名称
+        $department_ids = array_column($this->return_data['data'],'department_id');
+        $department_list = Structure::whereIn('id',$department_ids)->select(['id','name'])->get();
+        $department_list = array_column(\Common::laravel_to_array($department_list),'name','id');
+        foreach ($this->return_data['data'] as &$item){
+            $item['department_name'] = $department_list[$item['department_id']] ?? '';
+        }
         return $this->return_data;
     }
 
@@ -40,31 +52,32 @@ class RoleService extends ServiceBase
      * @param array $auth
      * @return mixed
      */
-    public function add_role($params,$auth = [])
+//    public function add_role($params,$auth = [])
+    public function add_role($params)
     {
         try {
-            DB::beginTransaction();
+            DB::connection('mysql_hr')->beginTransaction();
             $result = Role::create($params);
             if (!$result){
                 throw new \Exception('DATABASE ERROR',StatusConstants::ERROR_DATABASE);
             }
-            if ($auth){
-                // 添加角色组权限
-                $insert_data = [];
-                foreach ($auth as $item){
-                    $insert_data[] = [
-                        'role_id' => $result->id,
-                        'auth_rule_id' => $item,
-                    ];
-                }
-                $res = RoleAuthRule::insert($insert_data);
-                if (!$res){
-                    throw new \Exception('DATABASE ERROR',StatusConstants::ERROR_DATABASE);
-                }
-            }
-            DB::commit();
+//            if ($auth){
+//                // 添加角色组权限
+//                $insert_data = [];
+//                foreach ($auth as $item){
+//                    $insert_data[] = [
+//                        'role_id' => $result->id,
+//                        'auth_rule_id' => $item,
+//                    ];
+//                }
+//                $res = RoleAuthRule::insert($insert_data);
+//                if (!$res){
+//                    throw new \Exception('DATABASE ERROR',StatusConstants::ERROR_DATABASE);
+//                }
+//            }
+            DB::connection('mysql_hr')->commit();
         }catch (\Exception $e){
-            DB::rollBack();
+            DB::connection('mysql_hr')->rollBack();
             $this->return_data['code'] = $e->getCode();
             $this->return_data['msg'] = $e->getMessage();
         }

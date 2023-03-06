@@ -33,20 +33,27 @@ class RoleController extends BaseController
                 break;
             case 'POST':  // 添加角色
                 // 检测参数
-                $params['name']           = $this->check_param('name');
-                $params['type']        = $this->check_param('type');  // 1=全局 2=组织
-                $params['title']          = $this->data_arr['title'] ?? '';
-                $params['remark']         = $this->data_arr['remark'] ?? '';
-                $params['code']         = $this->check_param('code');
-                $params['pid']            = $this->check_param('pid',0);
-                $auth                     = $this->check_param('auth');
-                $data = $role_service->add_role($params,$auth);
+
+                $params['name']           = $this->check_param('name'); // 名称
+                $params['type']        = $this->check_param('type',1);  // 1=全局 2=组织
+                $params['pid']            = $this->check_param('pid',0);  // 父级id
+                $params['code']            = $this->check_param('code',0);  // 编码
+                $params['department_id']         = $this->data_arr['department_id'] ?? '';   // 备注
+                $params['order']            = $this->check_param('order',0);  // 排序
+                $params['status']            = $this->check_param('status',0);  // 状态 1=正常 2=停用
+                $params['remark']         = $this->data_arr['remark'] ?? '';   // 备注
+                if ($params['type'] == 2 && empty($params['department_id'])){
+                    \Common::response_error_header(400, 'invalid param department_id' );
+                }
+//                $auth                     = $this->check_param('auth');
+//                $data = $role_service->add_role($params,$auth);
+                $data = $role_service->add_role($params);
                 break;
             case 'PUT':  // 更新角色
                 // 检测参数
                 $id                      = $this->check_param('id');
                 $params['name']          = $this->data_arr['name'];
-                $params['is_menu']       = $this->data_arr['is_menu'];  // 是否菜单
+                $params['type']          = $this->data_arr['type'];  // 1=全局 2=组织
                 $params['title']         = $this->data_arr['title'] ?? '';
                 $params['remark']        = $this->data_arr['remark'] ?? '';
                 $params['pid']           = $this->data_arr('pid',0);
@@ -55,7 +62,7 @@ class RoleController extends BaseController
             default:
                 return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL,'Invalid Method');
         }
-        return \Common::format_return_result($data['code'],$data['msg'],$data['data']);
+        return \Common::format_return_result($data['code'], $data['msg'], $data['data']);
     }
 
 
