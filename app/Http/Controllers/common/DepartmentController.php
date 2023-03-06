@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use library\Constants\StatusConstants;
 use Predis\Command\Redis\DUMP;
 
-class DepartmentController extends BaseController
+class DepartmentController extends Controller
 {
 
 
@@ -38,7 +38,6 @@ class DepartmentController extends BaseController
 
 
         $result = $model::where('structure_id',  $structure_id )
-            ->where('id',  $id )
             ->where('pid',  $pid )
             ->where('group_type',  $group_type )
             ->select('id','name','structure_id','pid','encode','order','created_at','updated_at','leader')
