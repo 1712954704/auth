@@ -356,7 +356,7 @@ class UserService extends ServiceBase
             $this->return_data['data']['token'] = $token_data['token'];
         }catch (\Exception $e){
             $code = $e->getCode();
-            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+            if (in_array($code,array_keys(StatusConstants::STATUS_TO_CODE_MAPS))){
                 $this->return_data['code'] = $code;
             }else{
                 $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
@@ -442,7 +442,7 @@ class UserService extends ServiceBase
             $this->_redis->expire($key, $expire_time);
         }catch (\Exception $e){
             $code = $e->getCode();
-            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+            if (in_array($code,array_keys(StatusConstants::STATUS_TO_CODE_MAPS))){
                 $this->return_data['code'] = $code;
             }else{
                 $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
@@ -498,7 +498,7 @@ class UserService extends ServiceBase
             $this->return_data['data'] = $data[$type] ?? [];
         }catch (\Exception $e){
             $code = $e->getCode();
-            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+            if (in_array($code,array_keys(StatusConstants::STATUS_TO_CODE_MAPS))){
                 $this->return_data['code'] = $code;
             }else{
                 $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
@@ -635,10 +635,8 @@ class UserService extends ServiceBase
             $this->user_reset([$user_id],1);
         }catch (\Exception $e){
             DB::connection('mysql_common')->rollBack();
-            var_dump($e->getLine());
-            var_dump($e->getMessage());die();
             $code = $e->getCode();
-            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+            if (in_array($code,array_keys(StatusConstants::STATUS_TO_CODE_MAPS))){
                 $this->return_data['code'] = $code;
             }else{
                 $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
@@ -666,7 +664,7 @@ class UserService extends ServiceBase
         }catch (\Exception $e){
             DB::connection('mysql_common')->rollBack();
             $code = $e->getCode();
-            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+            if (in_array($code,array_keys(StatusConstants::STATUS_TO_CODE_MAPS))){
                 $this->return_data['code'] = $code;
             }else{
                 $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
@@ -675,6 +673,48 @@ class UserService extends ServiceBase
         return $this->return_data;
     }
 
+
+    /**
+     * 清除用户锁定(缓存)
+     * @author jack
+     * @dateTime 2023-03-06 18:10
+     * @param array $params         密码参数
+     * @param string $user_id        用户id
+     * @return array
+     */
+    public function user_reset_pwd($params,$user_id)
+    {
+        try {
+            $old_pwd = $params['old_pwd'];
+            $pwd = $params['pwd'];
+            $repeat_pwd = $params['repeat_pwd'];
+            // 获取用户缓存信息
+            $user_info = $this->get_user_info_by_id($user_id)['data'];
+            // 检测旧密码是否正确
+            $old_pwd = sha1($user_info['salt'].sha1($old_pwd));
+            if ($old_pwd != $user_info['pwd']){
+                throw new \Exception('',StatusConstants::ERROR_PASSWORD_CHECK_FAIL);
+            }
+            // 检测两次密码是否一致
+            if ($pwd != $repeat_pwd){
+                throw new \Exception('',StatusConstants::ERROR_PASSWORD_CHECK_FAIL);
+            }
+            $new_pwd = sha1($user_info['salt'].sha1($pwd));
+            $where['id'] = $user_id;
+            DB::connection('mysql_common')->beginTransaction();
+            User::where($where)->update(['pwd' => $new_pwd]);
+            DB::connection('mysql_common')->commit();
+        }catch (\Exception $e){
+            DB::connection('mysql_common')->rollBack();
+            $code = $e->getCode();
+            if (in_array($code,array_keys(StatusConstants::STATUS_TO_CODE_MAPS))){
+                $this->return_data['code'] = $code;
+            }else{
+                $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
+            }
+        }
+        return $this->return_data;
+    }
 
     /**
      * 获取用户列表
@@ -744,7 +784,7 @@ class UserService extends ServiceBase
             }
         }catch (\Exception $e){
             $code = $e->getCode();
-            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+            if (in_array($code,array_keys(StatusConstants::STATUS_TO_CODE_MAPS))){
                 $this->return_data['code'] = $code;
             }else{
                 $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
@@ -837,7 +877,7 @@ class UserService extends ServiceBase
             }
         }catch (\Exception $e){
             $code = $e->getCode();
-            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+            if (in_array($code,array_keys(StatusConstants::STATUS_TO_CODE_MAPS))){
                 $this->return_data['code'] = $code;
             }else{
                 $this->return_data['code'] = StatusConstants::ERROR_DATABASE;

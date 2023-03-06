@@ -63,7 +63,7 @@ class StructureService extends ServiceBase
             }
         }catch (\Exception $e){
             $code = $e->getCode();
-            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+            if (in_array($code,array_keys(StatusConstants::STATUS_TO_CODE_MAPS))){
                 $this->return_data['code'] = $code;
             }else{
                 $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
@@ -143,7 +143,7 @@ class StructureService extends ServiceBase
             }
         }catch (\Exception $e){
             $code = $e->getCode();
-            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+            if (in_array($code,array_keys(StatusConstants::STATUS_TO_CODE_MAPS))){
                 $this->return_data['code'] = $code;
             }else{
                 $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
@@ -166,7 +166,7 @@ class StructureService extends ServiceBase
             }
         }catch (\Exception $e){
             $code = $e->getCode();
-            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+            if (in_array($code,array_keys(StatusConstants::STATUS_TO_CODE_MAPS))){
                 $this->return_data['code'] = $code;
             }else{
                 $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
@@ -192,7 +192,7 @@ class StructureService extends ServiceBase
             }
         }catch (\Exception $e){
             $code = $e->getCode();
-            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+            if (in_array($code,array_keys(StatusConstants::STATUS_TO_CODE_MAPS))){
                 $this->return_data['code'] = $code;
             }else{
                 $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
@@ -221,7 +221,7 @@ class StructureService extends ServiceBase
             }
         }catch (\Exception $e){
             $code = $e->getCode();
-            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+            if (in_array($code,array_keys(StatusConstants::STATUS_TO_CODE_MAPS))){
                 $this->return_data['code'] = $code;
             }else{
                 $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
@@ -257,7 +257,7 @@ class StructureService extends ServiceBase
             }
         }catch (\Exception $e){
             $code = $e->getCode();
-            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+            if (in_array($code,array_keys(StatusConstants::STATUS_TO_CODE_MAPS))){
                 $this->return_data['code'] = $code;
             }else{
                 $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
