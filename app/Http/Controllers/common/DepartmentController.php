@@ -43,7 +43,7 @@ class DepartmentController extends BaseController
             ->where('group_type',  $group_type )
             ->select('id','name','structure_id','pid','encode','order','created_at','updated_at','leader')
             ->with(['children:id,name,structure_id,pid,encode,order,created_at,updated_at,leader'])
-            ->with(['leader:account'])
+            ->with(['leader:account,id'])
             ->orderBy('order', 'desc')
             ->paginate($perPage, $columns, $pageName, $current_page);;
 
@@ -111,7 +111,7 @@ class DepartmentController extends BaseController
             return \Common::format_return_result($response['code'],$response['msg'],$response['data']);
 
         } catch (\Throwable $e) {
-            \dump($e);
+            // \dump($e);
             return \Common::format_return_result($e->getCode(),$e->getMessage(),[]);
         }
 
