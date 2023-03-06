@@ -54,6 +54,7 @@ class RoleService extends ServiceBase
         $department_list = Structure::whereIn('id',$department_ids)->select(['id','name'])->get();
         $department_list = array_column(\Common::laravel_to_array($department_list),'name','id');
         foreach ($this->return_data['data']['data'] as &$item){
+            $item['created_at'] = strtotime($item['created_at']);
             $item['department_name'] = $department_list[$item['department_id']] ?? '';
         }
         return $this->return_data;
