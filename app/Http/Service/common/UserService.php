@@ -224,7 +224,7 @@ class UserService extends ServiceBase
      *
      * @return array
      */
-    public function _inner_get_user_auth_info_for_cache_new($user_id,$database_name='mysql_hr')
+    public function _inner_get_user_routes_info_for_cache($user_id,$database_name='mysql_hr')
     {
         // 查询用户权限信息
         $sql = "select DISTINCT(a.id),a.code,a.pid,a.type,a.title from hr_auth_rule a left join hr_role_auth_rule b on a.id = b.auth_rule_id
@@ -476,7 +476,7 @@ class UserService extends ServiceBase
                 $data = $this->_redis->hgetall($redis_key);  // 获取全部信息
             }
             if (!$this->_redis->exists($redis_key) || !$data){  // 用户缓存信息查不到则生成
-                $user_route_info = $this->_inner_get_user_auth_info_for_cache_new($user_id);
+                $user_route_info = $this->_inner_get_user_routes_info_for_cache($user_id);
                 if ($user_route_info){
                     $tree = $this->getTree($user_route_info, 0);
                     if ($tree){
@@ -585,7 +585,7 @@ class UserService extends ServiceBase
                 'emergency_contact_address' => $params['emergency_contact_address'],
                 'remark' => $params['remark'],
             ];
-            UserInfo::create($user_info);
+            UserInfo::create($user_info);  // todo 需要修改为创建完成后设置缓存 改为rabbitmq操作
             // 用户角色关系 创建关联关系
             $role_id = $params['role_id'];
             if ($role_id && is_array($role_id)){
@@ -645,11 +645,9 @@ class UserService extends ServiceBase
 
         try {
             $time = date('Y-m-d');
-//            $need_fields = ['id','job_number','account', 'phone','type','department_id','status'];
             // 只获取id 然后从缓存获取用户信息
             $need_fields = ['id'];
             $result = User::where($where)->offset($offset)->limit($limit)->select($need_fields)->get();
-
             $this->return_data['data']['total'] = User::where($where)->count();
             if (!$result){
                 throw new \Exception('',StatusConstants::ERROR_DATABASE);
@@ -671,6 +669,7 @@ class UserService extends ServiceBase
                 }else{
                     $item['entry_limit'] = '';
                 }
+                $item['position_name'] = '';
             }
             $department_ids = array_unique(array_column($this->return_data['data']['data'],'department_id'));
             $department_list = Structure::whereIn('id',$department_ids)->select(['id','name'])->get();
@@ -680,9 +679,6 @@ class UserService extends ServiceBase
                 $item['department_name'] = $department_list[$item['department_id']] ?? '';
             }
         }catch (\Exception $e){
-            var_dump($e->getLine());
-            var_dump($e->getMessage());die();
-            var_dump($e->getMessage());die();
             $code = $e->getCode();
             if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
                 $this->return_data['code'] = $code;
@@ -722,6 +718,68 @@ class UserService extends ServiceBase
         }
         $m < 0 && $y -= 1;
         return array($y, $m, $d);
+    }
+
+
+    /**
+     * 重置用户缓存
+     * @param array $ids
+     * @param int $system_type 1=hr 默认1
+     * @return array
+     */
+    public function user_reset($ids,$system_type = 1)
+    {
+        try {
+            $my_config = \Common::get_config();
+            $type = $my_config['system_type'][$system_type];
+            $user_manager = new UserManager();
+            foreach ($ids as $user_id){
+                // 更新info信息
+                $redis_key_info = $user_manager->get_user_cache_key($user_id);
+
+                $user_info = $this->_inner_get_user_info_for_cache($user_id);
+                if ($user_info){
+                    // 数组转json存储
+                    foreach($user_info as &$item){
+                        $item = json_encode($item);
+                    }
+                    $this->_redis->hMset($redis_key_info, $user_info);
+                }
+                // 更新auth权限信息
+                $redis_key_auth = $user_manager->get_user_auth_cache_key($user_id);
+                // todo 目前只获取了hr系统的权限 后续需要扩充
+                $user_auth_info = $this->_inner_get_user_auth_info_for_cache($user_id);
+                if ($user_auth_info){
+                    // 数组转json存储
+                    foreach($user_auth_info as &$item){
+                        $item = json_encode($item,JSON_UNESCAPED_UNICODE);
+                    }
+                    $this->_redis->hMset($redis_key_auth, $user_auth_info);
+                }
+                // 更新用户路由表信息 route
+                $redis_key_routes = $user_manager->get_user_route_cache_key($user_id);
+                $user_route_info = $this->_inner_get_user_routes_info_for_cache($user_id);
+                if ($user_route_info){
+                    $tree = $this->getTree($user_route_info, 0);
+                    if ($tree){
+                        $route_new[$type] = $tree;
+                        // 数组转json存储
+                        foreach($route_new as &$item){
+                            $item = json_encode($item,JSON_UNESCAPED_UNICODE);
+                        }
+                        $this->_redis->hMset($redis_key_routes, $route_new);
+                    }
+                }
+            }
+        }catch (\Exception $e){
+            $code = $e->getCode();
+            if (in_array($code,StatusConstants::STATUS_TO_CODE_MAPS)){
+                $this->return_data['code'] = $code;
+            }else{
+                $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
+            }
+        }
+        return $this->return_data;
     }
 
 

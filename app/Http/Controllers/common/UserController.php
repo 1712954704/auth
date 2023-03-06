@@ -171,8 +171,8 @@ class UserController extends BaseController
         switch ($this->method) {
             case 'POST': // 添加路由配置
                 // 检测参数
-                $id = $this->check_param('id');  // 账号
-                $data = $user_service->user_reset($id);
+                $ids = $this->check_param('ids');  // 账号
+                $data = $user_service->user_reset($ids,$this->system_type);
                 break;
             default:
                 return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL, 'Invalid Method');

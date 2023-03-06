@@ -34,7 +34,7 @@ class RoleController extends BaseController
             case 'POST':  // 添加角色
                 // 检测参数
                 $params['name']           = $this->check_param('name');
-                $params['is_menu']        = $this->check_param('is_menu');  // 是否菜单
+                $params['type']        = $this->check_param('type');  // 1=全局 2=组织
                 $params['title']          = $this->data_arr['title'] ?? '';
                 $params['remark']         = $this->data_arr['remark'] ?? '';
                 $params['pid']            = $this->check_param('pid',0);
