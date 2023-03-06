@@ -1730,6 +1730,13 @@ class Common{
         return $class;
         return ['controller' => $class, 'method' => $method];
     }
+    public static function getModelPath(){
+        $action = \Route::current()->getActionName();
+        list($class, $method) = explode('@', $action);
+        $class = substr($class,20);
+        $class=str_replace('Controller','',$class);
+        return "App\Models".$class;
+    }
 
     /**
      * 过滤非法字符

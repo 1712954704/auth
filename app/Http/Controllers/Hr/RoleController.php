@@ -33,6 +33,7 @@ class RoleController extends BaseController
                 break;
             case 'POST':  // 添加角色
                 // 检测参数
+
                 $params['name']           = $this->check_param('name'); // 名称
                 $params['type']        = $this->check_param('type',1);  // 1=全局 2=组织
                 $params['pid']            = $this->check_param('pid',0);  // 父级id
@@ -41,7 +42,6 @@ class RoleController extends BaseController
                 $params['order']            = $this->check_param('order',0);  // 排序
                 $params['status']            = $this->check_param('status',0);  // 状态 1=正常 2=停用
                 $params['remark']         = $this->data_arr['remark'] ?? '';   // 备注
-
                 if ($params['type'] == 2 && empty($params['department_id'])){
                     \Common::response_error_header(400, 'invalid param department_id' );
                 }

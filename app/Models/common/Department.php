@@ -19,6 +19,8 @@ class Department extends Model
         'created_at' => 'datetime:Y-m-d',
     ];
 
+
+
     /**
      * 获取与用户相关的电话记录
      */
