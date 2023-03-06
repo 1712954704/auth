@@ -7,6 +7,7 @@ use App\Models\Common\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use function MongoDB\BSON\toJSON;
 
 class Assessment extends Model
 {
@@ -20,6 +21,16 @@ class Assessment extends Model
         'updated_at'  => 'date:Y-m-d',
         'created_at' => 'datetime:Y-m-d',
     ];
+
+    // 查询列表
+    public function index($columns,$perPage,$current_page){
+
+        $result = Department::select($columns)
+            ->orderBy('order', 'desc')
+            ->paginate($perPage, $columns, '', $current_page);
+        $result->first_page_url ='2';
+        return $result;
+    }
 
     /**
      * 获取与用户相关的电话记录
