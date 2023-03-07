@@ -279,7 +279,6 @@ class StructureService extends ServiceBase
             'pid' => $id,
             'status' => ModelConstants::COMMON_STATUS_NORMAL,
         ];
-
         $fields = ['id','name','type','pid','group_type'];
         $list = Structure::with('child')->where($where)->select($fields)->get();
         $this->return_data['data']['data'] = \Common::laravel_to_array($list);

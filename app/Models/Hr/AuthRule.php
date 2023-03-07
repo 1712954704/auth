@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use library\Constants\Model\AuthConstants;
+use library\Constants\Model\ModelConstants;
 
 class AuthRule extends Authenticatable
 {
@@ -43,5 +45,23 @@ class AuthRule extends Authenticatable
      * @var bool
      */
     public $timestamps = false;
+
+
+    /**
+     * 使用关联模型获取顶级分类
+     */
+    public function subset() {
+        return $this->hasMany(get_class($this), 'pid' ,'id');
+    }
+
+    /**
+     * 获取所有子集分类
+     */
+    public function child() {
+        $fields = ['id','name','title','pid','type','remark','method','code','status','order','icon'];
+        return $this->subset()->with( 'child' )
+                ->where(['status'=>[AuthConstants::COMMON_STATUS_NORMAL,AuthConstants::COMMON_STATUS_OUTAGE,]])
+                ->select($fields);
+    }
 
 }
