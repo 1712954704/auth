@@ -7,6 +7,7 @@ use \App\Http\Controllers\Hr\RoleController;
 use \App\Http\Controllers\Common\UserController;
 use \App\Http\Controllers\Hr\StructureController;
 use \App\Http\Controllers\common\FileController;
+use \App\Http\Controllers\Common\PositionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,6 +65,15 @@ Route::controller(StructureController::class)->group(function () {
     Route::get('/structure/group', 'get_group_list');   // 获取上级单位信息
 //    Route::get('/structure/tree_list', 'get_tree_list');   // 获取组织结构树形结构 已废弃
 });
+
+Route::controller(PositionController::class)->group(function () {
+    Route::get('/position', 'position_operate');   // 获取职务列表
+    Route::post('/position', 'position_operate');  // 添加角色
+    Route::put('/position', 'position_operate');   // 修改角色信息
+    Route::delete('/position', 'position_operate');   // 删除角色信息
+//    Route::post('/auth/change_user_role', 'change_user_role');   // 添加角色用户关联
+});
+
 
 Route::controller(FileController::class)->group(function () {
     Route::post('/file/add_file', 'add_file');   // 文件上传
