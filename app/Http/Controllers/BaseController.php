@@ -97,6 +97,31 @@ class BaseController
             $this->check_auth($token);
         }
 
+
+        if (!$token){
+            if((isset($_SERVER['HTTP_AUTHORIZATION']) && $_SERVER['HTTP_AUTHORIZATION']) || (isset($_SERVER['HTTP_AUTHORIZATION_2']) && $_SERVER['HTTP_AUTHORIZATION_2']) ) {
+                $HTTP_AUTHORIZATION = !empty($_SERVER['HTTP_AUTHORIZATION_2'])?$_SERVER['HTTP_AUTHORIZATION_2']: $_SERVER['HTTP_AUTHORIZATION'];
+                $a = explode(" ", $HTTP_AUTHORIZATION);
+                if (isset($a[1]) && $a[1]) {
+                    $token = $a[1];
+                } else {
+                    \Common::response_error_header(401, 'invalid token');
+                }
+            } else{
+                \Common::response_error_header(401, 'invalid token 2');
+            }
+        }
+        $this->token = $token;
+        $user_service = new UserService();
+        $check_result = $user_service->get_user_info_by_token($token);
+        if ($check_result && isset($check_result['data']['id'])){
+            // 获取用户信息缓存
+            $user_result = $user_service->get_user_info_by_id($check_result['data']['id']);
+            if ($user_result['code'] == 200){
+                $this->user_info = $user_result['data'];
+            }
+        }
+
         END:
     }
 
