@@ -40,6 +40,7 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('/auth/rule', 'rule_operate');   // 获取路由列表
     Route::post('/auth/rule', 'rule_operate');  // 添加路由规则
     Route::put('/auth/rule', 'rule_operate');   // 修改路由规则
+    Route::delete('/auth/rule', 'rule_operate');// 删除路由规则
 });
 
 
