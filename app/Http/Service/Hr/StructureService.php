@@ -271,14 +271,23 @@ class StructureService extends ServiceBase
     /**
      * 获取组织部门树形结构
      * @param int $id
+     * @param array $params
      * @return array
     */
-    public function get_tree_list($id=0)
+    public function get_tree_list($id=0,$params)
     {
+        $group_type = $params['group_type'];
+
         $where = [
             'pid' => $id,
             'status' => ModelConstants::COMMON_STATUS_NORMAL,
         ];
+
+
+        if ($group_type){
+            $where['group_type'] = $group_type;
+        }
+
         $fields = ['id','name','type','pid','group_type'];
         $list = Structure::with('child')->where($where)->select($fields)->get();
         $this->return_data['data']['data'] = \Common::laravel_to_array($list);

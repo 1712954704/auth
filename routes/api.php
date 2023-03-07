@@ -48,8 +48,10 @@ Route::controller(RoleController::class)->group(function () {
     Route::get('/auth/role', 'role_operate');   // 获取角色列表
     Route::post('/auth/role', 'role_operate');  // 添加角色
     Route::put('/auth/role', 'role_operate');   // 修改角色信息
-    Route::post('/auth/change_user_role', 'change_user_role');   // 添加用户角色关联
-    Route::put('/auth/change_user_role', 'change_user_role');   // 修改用户角色关联
+    Route::delete('/auth/role', 'role_operate');   // 删除角色信息
+    Route::post('/auth/change_user_role', 'change_user_role');   // 添加角色用户关联
+    Route::post('/auth/change_role_auth', 'change_role_auth');   // 添加角色权限关联
+//    Route::put('/auth/change_user_role', 'change_user_role');   // 修改用户角色关联 已废弃
 });
 
 
@@ -60,7 +62,7 @@ Route::controller(StructureController::class)->group(function () {
     Route::delete('/structure', 'structure_operate');   // 删除组织架构
     Route::get('/region', 'get_region');   // 获取地区信息
     Route::get('/structure/group', 'get_group_list');   // 获取上级单位信息
-    Route::get('/structure/tree_list', 'get_tree_list');   // 获取上级单位信息
+//    Route::get('/structure/tree_list', 'get_tree_list');   // 获取组织结构树形结构 已废弃
 });
 
 Route::controller(FileController::class)->group(function () {
