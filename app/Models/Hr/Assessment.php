@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use function MongoDB\BSON\toJSON;
+use function Symfony\Component\Mime\Header\get;
 
 class Assessment extends Model
 {
@@ -23,13 +24,32 @@ class Assessment extends Model
     ];
 
     // 查询列表
-    public function index($columns,$perPage,$current_page){
+    // public static function index($columns,$perPage,$current_page,$user_id){
+    public static function index($columns,$limit,$offset,$user_id){
 
-        $result = Department::select($columns)
-            ->orderBy('order', 'desc')
-            ->paginate($perPage, $columns, '', $current_page);
-        $result->first_page_url ='2';
+        $model =  \common::getModelPath();
+        $result = $model::select('*')
+            ->where('user_id',$user_id)
+            ->orderBy('id', 'desc')
+            ->with(['user:account,id'])
+            ->limit($limit)
+            ->offset($offset)
+            ->get();
+            // ->paginate();
+
+        $result->first_page_url ='22222';
         return $result;
+    }
+    public function show($id){
+
+        $model =  \common::getModelPath();
+        $result = $model::where('id', '=', $id)
+            ->select('*')
+            ->with(['user:account,id,structure_id'])
+            ->first();
+
+        return $result;
+
     }
 
     /**
@@ -37,7 +57,7 @@ class Assessment extends Model
      */
     public function user()
     {
-        return $this->hasOne(User::class, 'id','pid');
+        return $this->hasOne(User::class, 'id','user_id');
     }
     /**
      * 获取与用户相关的名称

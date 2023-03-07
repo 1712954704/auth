@@ -28,6 +28,8 @@ class BaseController
 
     protected $user_info;  // 用户信息
 
+    protected $model;  // 获取model路径
+
     /**
      * 初始化
      * @param string $token     token
@@ -96,6 +98,9 @@ class BaseController
         if ($this->is_login && !in_array($this->route_at,$this->my_config['no_login'])){
             $this->check_auth($token);
         }
+
+        $this->model =  \common::getModelPath();
+
 
         END:
     }
