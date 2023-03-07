@@ -121,4 +121,24 @@ class StructureController extends BaseController
         return \Common::format_return_result($data['code'],$data['msg'],$data['data']);
     }
 
+    /**
+     * 获取组织架构树形结构
+     *
+     */
+    public function get_list()
+    {
+        $structure_service = new StructureService();
+        switch ($this->method) {
+            case 'GET':  // 获取组织架构列表
+                // 检测参数
+//                $id  = $this->get_safe_int_param('id',0);
+//                $group_type           = $this->check_param('group_type',1);     // 组织部门类型 默认为1=组织
+                $data = $structure_service->get_list();
+                break;
+            default:
+                return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL,'Invalid Method');
+        }
+        return \Common::format_return_result($data['code'],$data['msg'],$data['data']);
+    }
+
 }
