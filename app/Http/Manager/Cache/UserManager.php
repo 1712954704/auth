@@ -56,14 +56,15 @@ class UserManager extends ManagerBase
      * @return string|array
      */
     public function get_token_key($token) {
-        if (is_array($token)) {
-            foreach ($token as &$v) {
-                $v = UserConstants::CACHE_REDIS_TOKEN_KEY_PREFIX . $v;
-            }
-        }
-        else {
-            $token = UserConstants::CACHE_REDIS_TOKEN_KEY_PREFIX . $token;
-        }
+//        if (is_array($token)) {
+//            foreach ($token as &$v) {
+//                $v = UserConstants::CACHE_REDIS_TOKEN_KEY_PREFIX . $v;
+//            }
+//        }
+//        else {
+//            $token = UserConstants::CACHE_REDIS_TOKEN_KEY_PREFIX . $token;
+//        }
+        $token = UserConstants::CACHE_REDIS_TOKEN_KEY_PREFIX . $token;
         return $token;
     }
 
