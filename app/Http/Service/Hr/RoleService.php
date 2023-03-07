@@ -64,7 +64,6 @@ class RoleService extends ServiceBase
     /**
      * 添加角色
      * @param array $params
-     * @param array $auth
      * @return mixed
      */
 //    public function add_role($params,$auth = [])
@@ -142,8 +141,6 @@ class RoleService extends ServiceBase
             DB::connection('mysql_hr')->commit();
         }catch (\Exception $e){
             DB::connection('mysql_hr')->rollBack();
-            var_dump($e->getLine());
-            var_dump($e->getMessage());die();
             $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
         }
         return $this->return_data;
