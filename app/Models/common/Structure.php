@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use library\Constants\Model\ModelConstants;
 
 class Structure extends Authenticatable
 {
@@ -42,5 +43,21 @@ class Structure extends Authenticatable
      * @var bool
      */
     public $timestamps = false;
+
+
+    /**
+     * 使用关联模型获取顶级分类
+     */
+    public function subset() {
+        return $this->hasMany(get_class($this), 'pid' ,'id');
+    }
+
+    /**
+     * 获取所有子集分类
+     */
+    public function child() {
+        $fields = ['id','name','type','pid','group_type'];
+        return $this->subset()->with( 'child' )->where(['status'=>ModelConstants::COMMON_STATUS_NORMAL])->select($fields);
+    }
 
 }

@@ -355,8 +355,6 @@ class UserService extends ServiceBase
             $this->user_login_limit($expire_time,$account,UserConstants::USER_LOGIN_LIMIT_TYPE_SUCCESS);
             $this->return_data['data']['token'] = $token_data['token'];
         }catch (\Exception $e){
-            var_dump($e->getLine());
-            var_dump($e->getMessage());die();
             $code = $e->getCode();
             if (in_array($code,array_keys(StatusConstants::STATUS_TO_CODE_MAPS))){
                 $this->return_data['code'] = $code;
