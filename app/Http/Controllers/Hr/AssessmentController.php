@@ -19,6 +19,9 @@ class AssessmentController extends BaseController
      */
     public function index()
     {
+        $job_number = 5;
+        $where[] = ['type','>=',$job_number ];
+        // return $where;
         $columns = ['*'];
         $user_id = $this->check_param('user_id',0);
 
