@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\common;
+namespace App\Http\Controllers\Common;
 
 use App\Http\Controllers\BaseController;
 use App\Models\Common\File;
