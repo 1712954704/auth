@@ -132,7 +132,8 @@ class StructureController extends BaseController
             case 'GET':  // 获取组织架构列表
                 // 检测参数
                 $id  = $this->get_safe_int_param('id',0);
-                $data = $structure_service->get_tree_list($id);
+                $params['group_type']  = $this->data_arr['group_type'] ?? null;
+                $data = $structure_service->get_tree_list($id,$params);
                 break;
             default:
                 return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL,'Invalid Method');

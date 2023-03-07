@@ -123,7 +123,7 @@ class BaseController
                 $this->user_info = $user_result['data'];
             }
         }
-        
+
         $this->model =  \common::getModelPath();
 
         END:

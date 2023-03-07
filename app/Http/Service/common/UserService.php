@@ -191,8 +191,8 @@ class UserService extends ServiceBase
     public function _inner_get_user_auth_info_for_cache($user_id,$database_name='mysql_hr')
     {
         // 查询用户权限信息
-        $sql = "select DISTINCT(a.id), a.name,a.type,a.code,a.pid,a.method,a.title from hr_auth_rule a left join hr_role_auth_rule b on a.id = b.auth_rule_id
-        left join hr_user_role c on b.role_id=c.role_id where a.status = 1 and c.user_id = ".$user_id;
+        $sql = "select DISTINCT(a.id), a.name,a.type,a.code,a.pid,a.method,a.title from hr_auth_rule a left join hr_role_auth_rule b on a.id = b.auth_rule_id and b.status = 1
+        left join hr_user_role c on b.role_id=c.role_id and c.status = 1 where a.status = 1 and c.user_id = ".$user_id;
         $result = DB::connection($database_name)->select($sql);
 //        $return_data[NOW_SYSTEM_TYPE] = array_column(array_map('get_object_vars', $result),'name');
         $return_data[NOW_SYSTEM_TYPE] = $this->clear_auth_array_data(array_map('get_object_vars', $result));
