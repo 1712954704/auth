@@ -590,8 +590,8 @@ class UserService extends ServiceBase
                     $user['salt'] = $salt;
                     $user['pwd'] = sha1($salt.sha1($my_config['user_safe']['default_password'])); // 初始密码为默认设置;
                     $create_user_result = User::create($user);
-
-                    $user_info['user_id'] = $create_user_result->id;
+                    $user_id = $create_user_result->id;
+                    $user_info['user_id'] = $user_id;
                     UserInfo::create($user_info);  // todo 需要修改为创建完成后设置缓存 改为rabbitmq操作
                     // 用户角色关系 创建关联关系
                     $role_id = $params['role_id'];
@@ -635,6 +635,8 @@ class UserService extends ServiceBase
             $this->user_reset([$user_id],1);
         }catch (\Exception $e){
             DB::connection('mysql_common')->rollBack();
+            var_dump($e->getLine());
+            var_dump($e->getMessage());die();
             $code = $e->getCode();
             if (in_array($code,array_keys(StatusConstants::STATUS_TO_CODE_MAPS))){
                 $this->return_data['code'] = $code;

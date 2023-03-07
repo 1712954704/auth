@@ -32,7 +32,7 @@ class RoleController extends BaseController
                 $page             = $this->get_safe_int_param('page',1);
                 $limit            = $this->get_safe_int_param('limit',10);
                 $offset = ($page - 1) * $limit;
-                $params['name']         = $this->data_arr['name'] ?? '';   // 角色名称
+                $params['name']         = $this->data_arr['name'] ?? '';   // 名称
                 $params['department_id']         = $this->data_arr['department_id'] ?? '';   // 部门id
                 $data = $role_service->get_role($params,$limit,$offset);
                 break;
