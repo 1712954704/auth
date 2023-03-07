@@ -152,26 +152,26 @@ class RoleService extends ServiceBase
 
     /**
      * 添加用户角色关联
-     * @param int $user_id
-     * @param array $role
+     * @param array $user_ids
+     * @param int $role_id
      * @return mixed
      */
-    public function add_user_role($user_id,array $role)
+    public function add_user_role($role_id,$user_ids)
     {
-        if (is_array($role) && !$role){
+        if (is_array($user_ids) && !$user_ids){
             $this->return_data['code'] = StatusConstants::ERROR_ILLEGAL_PARAMS;
             return $this->return_data;
         }
 
         try {
-            DB::beginTransaction();
-            if ($role){
+            DB::connection('mysql_hr')->beginTransaction();
+            if ($user_ids){
                 // 添加角色组权限
                 $insert_data = [];
-                foreach ($role as $item){
+                foreach ($user_ids as $item){
                     $insert_data[] = [
-                        'user_id' => $user_id,
-                        'role_id' => $item,
+                        'user_id' => $item,
+                        'role_id' => $role_id,
                     ];
                 }
                 $res = UserRole::insert($insert_data);
@@ -179,9 +179,47 @@ class RoleService extends ServiceBase
                     throw new \Exception('DATABASE ERROR',StatusConstants::ERROR_DATABASE);
                 }
             }
-            DB::commit();
+            DB::connection('mysql_hr')->commit();
         }catch (\Exception $e){
-            DB::rollBack();
+            DB::connection('mysql_hr')->rollBack();
+            $this->return_data['code'] = $e->getCode();
+            $this->return_data['msg'] = $e->getMessage();
+        }
+        return $this->return_data;
+    }
+
+    /**
+     * 添加用户角色关联
+     * @param int $role_id
+     * @param array $auth_ids
+     * @return mixed
+     */
+    public function add_role_auth($role_id,$auth_ids)
+    {
+        if (is_array($auth_ids) && !$auth_ids){
+            $this->return_data['code'] = StatusConstants::ERROR_ILLEGAL_PARAMS;
+            return $this->return_data;
+        }
+
+        try {
+            DB::connection('mysql_hr')->beginTransaction();
+            if ($auth_ids){
+                // 添加角色组权限
+                $insert_data = [];
+                foreach ($auth_ids as $item){
+                    $insert_data[] = [
+                        'auth_rule_id' => $item,
+                        'role_id' => $role_id,
+                    ];
+                }
+                $res = RoleAuthRule::insert($insert_data);
+                if (!$res){
+                    throw new \Exception('DATABASE ERROR',StatusConstants::ERROR_DATABASE);
+                }
+            }
+            DB::connection('mysql_hr')->commit();
+        }catch (\Exception $e){
+            DB::connection('mysql_hr')->rollBack();
             $this->return_data['code'] = $e->getCode();
             $this->return_data['msg'] = $e->getMessage();
         }
