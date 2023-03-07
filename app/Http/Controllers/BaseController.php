@@ -28,6 +28,8 @@ class BaseController
 
     protected $user_info;  // 用户信息
 
+    protected $model;  // 获取model路径
+
     /**
      * 初始化
      * @param string $token     token
@@ -121,6 +123,8 @@ class BaseController
                 $this->user_info = $user_result['data'];
             }
         }
+        
+        $this->model =  \common::getModelPath();
 
         END:
     }
