@@ -25,17 +25,21 @@ class Assessment extends Model
 
     // 查询列表
     // public static function index($columns,$perPage,$current_page,$user_id){
-    public static function index($columns,$limit,$offset,$user_id){
+    public static function index($columns,$limit,$offset,$user_id,$where){
 
+        // offset 设置从哪里开始
+        // limit 设置想要查询多少条数据
         $model =  \common::getModelPath();
-        $result = $model::select('*')
-            ->where('user_id',$user_id)
+        $result = $model::select($columns)
+            ->where($where)
             ->orderBy('id', 'desc')
             ->with(['user:account,id'])
             ->limit($limit)
             ->offset($offset)
             ->get();
-            // ->paginate();
+
+        // $result['data']['total'] = $model::where($where)->count();
+        $result['total'] =  $model::where($where)->count();
 
         $result->first_page_url ='22222';
         return $result;

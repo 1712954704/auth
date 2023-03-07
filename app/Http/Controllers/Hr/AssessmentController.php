@@ -19,20 +19,15 @@ class AssessmentController extends BaseController
      */
     public function index()
     {
-        // $model =  \common::getModelPath();
-        $columns = ['id','name'];
-        // $current_page = request('current_page') ? request('current_page') : 1;;
-        // $perPage = request('perPage') ? request('perPage') : 2;
-        $user_id = request('user_id');
+        $columns = ['*'];
+        $user_id = $this->check_param('user_id',0);
 
-        $page = $this->check_param('page',0);;
+        $page = $this->check_param('page',0);
         $limit = $this->check_param('limit',10);;
-
         $offset = ($page - 1) * $limit;
+        $where['user_id'] = $user_id;
 
-        // $date = new $model;
-        // $result = $date->index($user_id,$columns,$perPage,$current_page);
-        $result = $this->model::index($user_id,$columns,$limit,$offset);
+        $result = $this->model::index($columns,$limit,$offset,$user_id,$where);
 
         $response['code'] = count($result) > 0  ?'200':'404';
         $response['msg']  = count($result) > 0  ?'success':'数据不存在';
