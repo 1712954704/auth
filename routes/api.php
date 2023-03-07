@@ -59,6 +59,7 @@ Route::controller(StructureController::class)->group(function () {
     Route::delete('/structure', 'structure_operate');   // 删除组织架构
     Route::get('/region', 'get_region');   // 获取地区信息
     Route::get('/structure/group', 'get_group_list');   // 获取上级单位信息
+    Route::get('/structure/tree_list', 'get_tree_list');   // 获取上级单位信息
 });
 
 Route::controller(FileController::class)->group(function () {
