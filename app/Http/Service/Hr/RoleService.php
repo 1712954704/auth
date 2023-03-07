@@ -12,6 +12,7 @@ use App\Models\Hr\Role;
 use App\Models\Hr\RoleAuthRule;
 use App\Models\Hr\UserRole;
 use Illuminate\Support\Facades\DB;
+use library\Constants\Model\AuthConstants;
 use library\Constants\StatusConstants;
 
 class RoleService extends ServiceBase
@@ -113,7 +114,38 @@ class RoleService extends ServiceBase
         if (!$result){
             $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
         }
-        $this->return_data['data'] = \Common::laravel_to_array($result);
+        return $this->return_data;
+    }
+
+    /**
+     * 删除角色信息
+     * @param int $id
+     * @return mixed
+     */
+    public function del_role($id)
+    {
+        try {
+            $where_role = [
+                'id' => $id
+            ];
+            $where_role_auth_rule = [
+                'role_id' => $id
+            ];
+            $data = [
+                'status' => AuthConstants::COMMON_STATUS_DELETE
+            ];
+            DB::connection('mysql_hr')->beginTransaction();
+            // 更新角色表
+            Role::where($where_role)->update($data);
+            // 更新角色规则关联 status = -1
+            RoleAuthRule::where($where_role_auth_rule)->update($data);
+            DB::connection('mysql_hr')->commit();
+        }catch (\Exception $e){
+            DB::connection('mysql_hr')->rollBack();
+            var_dump($e->getLine());
+            var_dump($e->getMessage());die();
+            $this->return_data['code'] = StatusConstants::ERROR_DATABASE;
+        }
         return $this->return_data;
     }
 

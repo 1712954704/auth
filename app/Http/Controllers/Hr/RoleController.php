@@ -69,6 +69,11 @@ class RoleController extends BaseController
                 }
                 $data = $role_service->update_role($id,$params);
                 break;
+            case 'DELETE':  // 删除角色
+                // 检测参数
+                $id                      = $this->check_param('id');
+                $data = $role_service->del_role($id);
+                break;
             default:
                 return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL,'Invalid Method');
         }
