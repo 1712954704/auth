@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use library\Constants\StatusConstants;
 use Predis\Command\Redis\DUMP;
 
-class DepartmentController extends Controller
+class DepartmentController extends BaseController
 {
 
 
@@ -23,7 +23,7 @@ class DepartmentController extends Controller
     public function index()
     {
 
-        $model =  "App\Models\common\\".\common::getControllerName();
+        $model =  \common::getModelPath();
 
 
         $columns = ['*'];
@@ -35,6 +35,9 @@ class DepartmentController extends Controller
         $id = request('id') ;
         $group_type = request('group_type') ;
         $group_type_child = [];
+        $page = $this->check_param('page',0);
+        $limit = $this->check_param('limit',10);
+        $offset = ($page - 1) * $limit;
 
         // $whereIn = [1,2];
         if ($group_type){
@@ -48,12 +51,15 @@ class DepartmentController extends Controller
 
         $where['pid'] = $pid;
 
-        $result = $model::where($where)
+        $result['data'] = $model::where($where)
             ->select('id','name','structure_id','pid','encode','order','created_at','updated_at','leader')
             ->with(['children:id,name,structure_id,pid,encode,order,created_at,updated_at,leader'])
             ->with(['leader:account,id'])
             ->orderBy('order', 'desc')
-            ->paginate($perPage, $columns, $pageName, $current_page);
+            ->limit($limit)
+            ->offset($offset)
+            ->get();
+        $result['total'] =  $model::where($where)->count();
 
 
 

@@ -40,6 +40,14 @@ class Assessment extends Model
        $result['total'] =  $model::where($where)->count();
         return $result;
     }
+    /**
+     * 获取考评的所有绩效
+     */
+    public function assessment_detail()
+    {
+        return $this->hasMany(Assessments_detail::class, 'assessment_id');
+    }
+
 
     // 远程一对多
     public function deployments()
@@ -67,7 +75,9 @@ class Assessment extends Model
         $result = $model::where('id', '=', $id)
             ->select('*')
             ->with(['user:account,id,structure_id'])
+            ->with(['assessment_detail:id,assessment_id'])
             ->first();
+
 
         return $result;
 
