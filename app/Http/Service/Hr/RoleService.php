@@ -66,12 +66,11 @@ class RoleService extends ServiceBase
      * @param array $params
      * @return mixed
      */
-//    public function add_role($params,$auth = [])
     public function add_role($params)
     {
         try {
             DB::connection('mysql_hr')->beginTransaction();
-            $result = Role::create($params);
+            $result = Role::insert($params);
             if (!$result){
                 throw new \Exception('DATABASE ERROR',StatusConstants::ERROR_DATABASE);
             }
