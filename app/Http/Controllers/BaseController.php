@@ -99,7 +99,7 @@ class BaseController
             $this->check_auth($token);
         }
 
-        if (!$this->route_at == 'api/user/login'){
+        if (!($this->route_at == 'api/user/login')){
             if (!$token){
                 if((isset($_SERVER['HTTP_AUTHORIZATION']) && $_SERVER['HTTP_AUTHORIZATION']) || (isset($_SERVER['HTTP_AUTHORIZATION_2']) && $_SERVER['HTTP_AUTHORIZATION_2']) ) {
                     $HTTP_AUTHORIZATION = !empty($_SERVER['HTTP_AUTHORIZATION_2'])?$_SERVER['HTTP_AUTHORIZATION_2']: $_SERVER['HTTP_AUTHORIZATION'];
