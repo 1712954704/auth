@@ -56,10 +56,10 @@ class UserController extends BaseController
         $user_service = new UserService();
         switch ($this->method) {
             case 'GET': // 获取用户信息
-                $data['data']['info'] = $this->user_info;
-                $routes = $user_service->user_route_info($this->user_info['id'],$this->system_type);
-                $data['code'] = $routes['code'];
-                $data['msg'] = $routes['msg'];
+                $data['data']['info']   = $this->user_info;
+                $routes                 = $user_service->user_route_info($this->user_info['id'],$this->system_type);
+                $data['code']           = $routes['code'];
+                $data['msg']            = $routes['msg'];
                 $data['data']['routes'] = $routes['data'];
                 break;
             default:
