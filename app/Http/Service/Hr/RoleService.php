@@ -43,7 +43,7 @@ class RoleService extends ServiceBase
             $where['department_id'] = $department_id;
         }
 
-        $fields = ['id','name','pid','type','code','department_id','status','created_at'];
+        $fields = ['id','name','pid','type','code','department_id','status','created_at','order'];
         $result = Role::where($where)->limit($limit)->offset($offset)->select($fields)->get();
         $this->return_data['data']['total'] = Role::where($where)->select($fields)->count();
         if (!$result){
