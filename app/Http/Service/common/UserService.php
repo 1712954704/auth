@@ -7,6 +7,7 @@
 namespace App\Http\Service\Common;
 
 use App\Http\Manager\Cache\UserManager;
+use App\Models\Common\Nation;
 use App\Models\Common\Structure;
 use App\Models\common\User;
 use App\Models\common\UserInfo;
@@ -648,7 +649,6 @@ class UserService extends ServiceBase
     }
 
 
-
     /**
      * 清除用户锁定(缓存)
      * @author jack
@@ -889,4 +889,12 @@ class UserService extends ServiceBase
     }
 
 
+    /**
+     * 获取民族列表
+    */
+    public function get_nation_list()
+    {
+        $this->return_data['data'] = Nation::select(['id','name'])->get();
+        return $this->return_data;
+    }
 }
