@@ -75,7 +75,7 @@ class Assessment extends Model
         $result = $model::where('id', '=', $id)
             ->select('*')
             ->with(['user:account,id,structure_id'])
-            ->with(['assessment_detail:id,assessment_id'])
+            ->with(['assessment_detail'])
             ->first();
 
 
