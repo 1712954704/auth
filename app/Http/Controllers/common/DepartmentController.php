@@ -50,7 +50,6 @@ class DepartmentController extends BaseController
 
         define('GROUP_TYPE', $group_type_child); // 定义当前系统类型
 
-
         $where['pid'] = $pid;
 
         $result['data'] = Department::where($where)
@@ -61,9 +60,8 @@ class DepartmentController extends BaseController
             ->limit($limit)
             ->offset($offset)
             ->get();
+
         $result['total'] =  $model::where($where)->count();
-
-
 
 
         $response['code'] = count($result) > 0  ?'200':'404';
@@ -71,8 +69,6 @@ class DepartmentController extends BaseController
         $response['data'] = $result ;
 
         return \Common::format_return_result($response['code'],$response['msg'],$response['data']);
-
-
 
 
 
@@ -154,7 +150,7 @@ class DepartmentController extends BaseController
             ->first();
 
         // $array=explode(",",$result->rules);
-        // $result->test_date=$array;
+        // $result->test_date=$array; see you
 
 
         $response['code'] = $result  ? '200':'404';
