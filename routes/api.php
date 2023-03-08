@@ -35,6 +35,7 @@ Route::controller(UserController::class)->group(function () {
     Route::put('/user/edit', 'user_register_or_edit');   // 编辑用户
     Route::delete('/user/del', 'user_del');   // 删除用户
     Route::post('/user/reset_pwd', 'user_reset_pwd');   // 用户重置密码
+    Route::get('/nation_list', 'get_nation_list');   // 获取民族列表
 });
 
 Route::controller(AuthController::class)->group(function () {

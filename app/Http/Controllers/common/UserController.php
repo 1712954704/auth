@@ -222,4 +222,21 @@ class UserController extends BaseController
         return \Common::format_return_result($data['code'], $data['msg'], $data['data']);
     }
 
+    /**
+     * 获取民族列表
+    */
+    public function get_nation_list()
+    {
+        $user_service = new UserService();
+        switch ($this->method) {
+            case 'GET': // 添加路由配置
+                // 检测参数
+                $data = $user_service->get_nation_list();
+                break;
+            default:
+                return \Common::format_return_result(StatusConstants::ERROR_ILLEGAL, 'Invalid Method');
+        }
+        return \Common::format_return_result($data['code'], $data['msg'], $data['data']);
+    }
+
 }

@@ -24,7 +24,8 @@ return [
         'api/user/login',
         'api/user/clear_user_lock',
         'api/user/register',
-        'api/file/add_file'
+        'api/file/add_file',
+        'api/nation_list'
     ],  // 免登录接口
 
     /** 业务配置 */
