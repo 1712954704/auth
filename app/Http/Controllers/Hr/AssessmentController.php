@@ -33,10 +33,11 @@ class AssessmentController extends BaseController
         // // 模型层处理数据库数据
         // $result = $this->model::index($columns,$limit,$offset,$where);
 
+        // Sever层处理页面逻辑
         $AssessmentService  = new AssessmentService();
         $result = $AssessmentService->index($user_id,$limit,$offset);
 
-        // Sever层处理页面逻辑
+
 
         // // 返回结果
         // $response['code'] = count($result) > 0  ?'200':'404';

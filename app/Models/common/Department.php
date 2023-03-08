@@ -19,7 +19,22 @@ class Department extends Model
         'created_at' => 'datetime:Y-m-d',
     ];
 
+    // 查询列表
+    public static function index($columns,$limit,$offset,$where){
 
+        // offset 设置从哪里开始
+        // limit 设置想要查询多少条数据
+        $model =  \common::getModelPath();
+        $result['data'] = $model::select($columns)
+            ->where($where)
+            ->orderBy('id', 'desc')
+            ->with(['user:account,id'])
+            ->limit($limit)
+            ->offset($offset)
+            ->get();
+        $result['total'] =  $model::where($where)->count();
+        return $result;
+    }
 
     /**
      * 获取与用户相关的电话记录
