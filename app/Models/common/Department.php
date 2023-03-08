@@ -51,7 +51,8 @@ class Department extends Model
     // 递归子级
     public function children()
     {
-        return $this->child()->with('children:id,name,structure_id,pid,encode,order,created_at,updated_at');
+        // return $this->child()->with('children:id,name,structure_id,pid,encode,order,created_at,updated_at');
+        return $this->child()->with('children:id,name,structure_id,pid,encode,order,created_at,updated_at')->where(GROUP_TYPE);
     }
 
     public function father()

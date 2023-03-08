@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Common;
 
 use App\Http\Controllers\BaseController;
 use App\Http\Controllers\Controller;
-use App\Models\common\Department;
 use App\Models\Hr\Position;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -50,13 +49,8 @@ class DepartmentController extends Controller
         $where['pid'] = $pid;
 
         $result = $model::where($where)
-            // ->where($where)
-            // ->whereIn('group_type',$whereIn)
             ->select('id','name','structure_id','pid','encode','order','created_at','updated_at','leader')
             ->with(['children:id,name,structure_id,pid,encode,order,created_at,updated_at,leader'])
-            // ->with(['children'=>function ($q) use ($group_type) {
-            //     $q->where('group_type', $group_type);
-            // }])
             ->with(['leader:account,id'])
             ->orderBy('order', 'desc')
             ->paginate($perPage, $columns, $pageName, $current_page);
