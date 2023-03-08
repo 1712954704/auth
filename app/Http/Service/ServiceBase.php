@@ -35,6 +35,8 @@ class ServiceBase {
      */
     protected $_redis;
 
+    protected $model;  // 获取model路径
+
     protected $return_data = [
         'code' => StatusConstants::SUCCESS,
         'msg'  => '',
@@ -45,6 +47,8 @@ class ServiceBase {
     {
 //        $this->_container = CBox::instance();
         $this->_redis = $this->get_redis();
+        $this->model =  \common::getModelPath();
+
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Hr;
 
 use App\Http\Controllers\BaseController;
 use App\Http\Controllers\Controller;
+use App\Http\Service\Hr\AssessmentService;
 use App\Models\common\Department;
 use App\Models\Hr\Assessment;
 use Illuminate\Http\Request;
@@ -19,24 +20,30 @@ class AssessmentController extends BaseController
      */
     public function index()
     {
-        $job_number = 5;
-        $where[] = ['type','>=',$job_number ];
-        // return $where;
+        // 接收参数
         $columns = ['*'];
         $user_id = $this->check_param('user_id',0);
-
         $page = $this->check_param('page',0);
-        $limit = $this->check_param('limit',10);;
+        $limit = $this->check_param('limit',10);
         $offset = ($page - 1) * $limit;
-        $where['user_id'] = $user_id;
+        $test_number = 0;
+        // $where['user_id'] = $user_id;
+        // $where[] = ['type','>=',$test_number ];
+        //
+        // // 模型层处理数据库数据
+        // $result = $this->model::index($columns,$limit,$offset,$where);
 
-        $result = $this->model::index($columns,$limit,$offset,$user_id,$where);
+        $AssessmentService  = new AssessmentService();
+        $result = $AssessmentService->index($user_id,$limit,$offset);
 
-        $response['code'] = count($result) > 0  ?'200':'404';
-        $response['msg']  = count($result) > 0  ?'success':'数据不存在';
-        $response['data'] = $result ;
+        // Sever层处理页面逻辑
 
-        return \Common::format_return_result($response['code'],$response['msg'],$response['data']);
+        // // 返回结果
+        // $response['code'] = count($result) > 0  ?'200':'404';
+        // $response['msg']  = count($result) > 0  ?'success':'数据不存在';
+        // $response['data'] = $result ;
+
+        return \Common::format_return_result($result['code'],$result['msg'],$result['data']);
     }
 
     /**

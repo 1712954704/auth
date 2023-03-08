@@ -2,7 +2,7 @@
 
 namespace App\Models\Hr;
 
-use App\Models\common\Department;
+use App\Models\Common\Department;
 use App\Models\Common\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,26 +24,43 @@ class Assessment extends Model
     ];
 
     // 查询列表
-    // public static function index($columns,$perPage,$current_page,$user_id){
-    public static function index($columns,$limit,$offset,$user_id,$where){
+    public static function index($columns,$limit,$offset,$where){
 
         // offset 设置从哪里开始
         // limit 设置想要查询多少条数据
         $model =  \common::getModelPath();
-        $result = $model::select($columns)
+        $result['data'] = $model::select($columns)
             ->where($where)
             ->orderBy('id', 'desc')
             ->with(['user:account,id'])
             ->limit($limit)
             ->offset($offset)
             ->get();
-
-        // $result['data']['total'] = $model::where($where)->count();
-        $result['total'] =  $model::where($where)->count();
-
-        $result->first_page_url ='22222';
+       // $result['total'] =  $model::where($where)->count();
+       $result['total'] =  $model::where($where)->count();
         return $result;
     }
+
+    // 远程一对多
+    public function deployments()
+    {
+
+        // 第一个参数是我们最终想要访问的模型的名称
+        // 第二个参数是中间模型的名称
+        // 第三个参数是中间表的外键名
+        // 第四个参数是最终想要访问的模型的外键名
+        // 第五个参数是当前模型的本地键名
+        // 第六个参数是中间模型的本地键名
+        return $this->hasManyThrough(
+            Deployment::class,
+            Environment::class,
+            'project_id', // environments 表的外键名
+            'environment_id', // deployments 表的外键名
+            'id', // projects 表的本地键名
+            'id' // environments 表的本地键名
+        );
+    }
+
     public function show($id){
 
         $model =  \common::getModelPath();

@@ -30,21 +30,38 @@ class DepartmentController extends Controller
         $columns = ['*'];
         $pageName = 'bio';
         $current_page = request('current_page') ? request('current_page') : 1;;
-        $perPage = request('perPage') ? request('perPage') : 2;
+        $perPage = request('perPage') ? request('perPage') : 10;
         $pid = request('pid') ;
         $structure_id = request('structure_id') ;
         $id = request('id') ;
-        $group_type= request('group_type') ;
+        $group_type = request('group_type') ;
+        $group_type_child = [];
+
+        // $whereIn = [1,2];
+        if ($group_type){
+            // $whereIn = [$group_type];
+            $group_type_child['group_type'] = $group_type;
+            $where['group_type'] = $group_type;
+        }
+
+        define('GROUP_TYPE', $group_type_child); // 定义当前系统类型
 
 
-        $result = $model::where('structure_id',  $structure_id )
-            ->where('pid',  $pid )
-            ->where('group_type',  $group_type )
+        $where['pid'] = $pid;
+
+        $result = $model::where($where)
+            // ->where($where)
+            // ->whereIn('group_type',$whereIn)
             ->select('id','name','structure_id','pid','encode','order','created_at','updated_at','leader')
             ->with(['children:id,name,structure_id,pid,encode,order,created_at,updated_at,leader'])
+            // ->with(['children'=>function ($q) use ($group_type) {
+            //     $q->where('group_type', $group_type);
+            // }])
             ->with(['leader:account,id'])
             ->orderBy('order', 'desc')
-            ->paginate($perPage, $columns, $pageName, $current_page);;
+            ->paginate($perPage, $columns, $pageName, $current_page);
+
+
 
 
         $response['code'] = count($result) > 0  ?'200':'404';
