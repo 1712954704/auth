@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Common;
 
 use App\Http\Controllers\BaseController;
 use App\Http\Controllers\Controller;
+use App\Models\Common\Department;
+use App\Models\Common\Structure;
 use App\Models\Hr\Position;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -51,9 +53,9 @@ class DepartmentController extends BaseController
 
         $where['pid'] = $pid;
 
-        $result['data'] = $model::where($where)
-            ->select('id','name','structure_id','pid','encode','order','created_at','updated_at','leader')
-            ->with(['children:id,name,structure_id,pid,encode,order,created_at,updated_at,leader'])
+        $result['data'] = Department::where($where)
+            ->select('id','name','pid','code','order','created_at','updated_at')
+            ->with(['children:id,name,pid,code,order,created_at,updated_at'])
             ->with(['leader:account,id'])
             ->orderBy('order', 'desc')
             ->limit($limit)
@@ -151,12 +153,12 @@ class DepartmentController extends BaseController
             ->select('id','name','structure_id','pid','encode','order','group_type','leader')
             ->first();
 
-        $array=explode(",",$result->rules);
-        $result->test_date=$array;
+        // $array=explode(",",$result->rules);
+        // $result->test_date=$array;
 
 
-        $response['code'] = $result->id > 0  ? '200':'404';
-        $response['msg']  = $result->id > 0  ? 'success':'数据不存在';
+        $response['code'] = $result  ? '200':'404';
+        $response['msg']  = $result  ? 'success':'数据不存在';
         $response['data'] = $result ;
 
         return \Common::format_return_result($response['code'],$response['msg'],$response['data']);

@@ -58,7 +58,7 @@ class Department extends Model
         return $this->hasOne(Department::class, 'id','pid');
     }
 
-    public function child()
+    public function childhood()
     {
         return $this->hasMany(self::class,'pid');
     }
@@ -67,7 +67,7 @@ class Department extends Model
     public function children()
     {
         // return $this->child()->with('children:id,name,structure_id,pid,encode,order,created_at,updated_at');
-        return $this->child()->with('children:id,name,structure_id,pid,encode,order,created_at,updated_at')->where(GROUP_TYPE);
+        return $this->childhood()->with('children:id,name,structure_id,pid,encode,order,created_at,updated_at')->where(GROUP_TYPE);
     }
 
     public function father()

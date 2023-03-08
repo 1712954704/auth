@@ -60,4 +60,25 @@ class Structure extends Authenticatable
         return $this->subset()->with( 'child' )->where(['status'=>ModelConstants::COMMON_STATUS_NORMAL])->select($fields);
     }
 
+
+    public function childhood()
+    {
+        return $this->hasMany(self::class,'pid');
+    }
+
+    // 递归子级
+    public function children()
+    {
+        // return $this->child()->with('children:id,name,structure_id,pid,encode,order,created_at,updated_at');
+        return $this->childhood()->with('children:id,name,pid,code,order,created_at,updated_at')->where(GROUP_TYPE);
+    }
+
+    /**
+     * 获取与用户相关的名称
+     */
+    public function leader()
+    {
+        return $this->hasOne(User::class, 'id','leader');
+    }
+
 }
